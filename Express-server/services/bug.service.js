@@ -1,8 +1,9 @@
 
-import { utilService } from './util.service.js'
-import Axios from 'axios'
+import { readJsonFile } from './util.service.js'
+import { writeJsonFile } from './util.service.js'
+// import Axios from 'axios'
 
-const bugs = utilService.readJsonFile('./data/bugs.json')
+const bugs = readJsonFile('./data/bugs.json')
 
 // var gAxios = Axios.create({
 //     withCredentials: true,
@@ -16,12 +17,12 @@ export const bugService = {
     save,
 }
 
-
 async function query() {
     // var res = await gAxios.get(BASE_URL)
     // var bugs = res.data
     return bugs
 }
+
 function getById(bugId) {
     const bug = bugs.find(b => b._id === bugId)
     return bug
@@ -32,17 +33,19 @@ async function remove(bugId) {
 
     return _saveBugs()
 }
+
 async function save(bugToSave) {
     if (bugToSave._id) {
         const idx = bugs.findIndex(b => b._id === bugToSave._id)
         bugs.splice(idx, 1, bugToSave)
     } else {
-        bugToSave._id = utilService.makeId()
+        bugToSave._id = makeId()
         bugs.push(bugToSave)
     }
     await _saveBugs()
     return bugToSave
 }
+
 function _saveBugs() {
-    return utilService.writeJsonFile('data/bugs.json', bugs)
+    return writeJsonFile('data/bugs.json', bugs)
 }

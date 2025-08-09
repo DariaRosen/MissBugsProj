@@ -1,26 +1,9 @@
 import express from 'express'
 import { makeId } from './services/util.service.js'
+import { bugService } from './services/bug.service.js'
 
 const app = express()
 
-const bugs = [
-    {
-        "_id": "abc123",
-        "title": "Cannot save a Car",
-        "severity": 3,
-        "createdAt": 1542107359454
-    },
-    {
-        "_id": "vawNC3",
-        "title": "bbb",
-        "severity": 6
-    },
-    {
-        "_id": "JNJiEa",
-        "title": "ccc",
-        "severity": 7
-    }
-]
 app.get('/', (req, res) => {
     res.send('Hello, World!!!')
 })
@@ -29,35 +12,28 @@ app.get('/puki', (req, res) => {
     res.send('Puki is here!')
 })
 
-app.get('/api/bug', (req, res) => {
+app.get('/api/bug', async (req, res) => {
+    const bugs = await bugService.query()
     res.send(bugs)
 })
 
-app.get('/api/bug/:id/remove', (req, res) => {
+app.get('/api/bug/:id/remove', async (req, res) => {
     const bugId = req.params.id
-    const bugIndex = bugs.findIndex(bug => bug._id === bugId)
-    bugs.splice(bugIndex, 1)
+    await bugService.remove(bugId)
     res.send({ message: 'Bug removed successfully' })
 })
 
-app.get('/api/bug/save', (req, res) => {
+app.get('/api/bug/save', async (req, res) => {
     const { _id, title, severity } = req.query
     const newBug = { _id, title, severity: +severity }
     console.log('Saving bug:', newBug)
-    if (newBug._id) {
-        const idx = bugs.findIndex(bug => bug._id === newBug._id)
-        bugs.splice(idx, 1, newBug)
-    }
-    else {
-        newBug._id = makeId()
-        bugs.push(newBug)
-    }
-    res.send({ newBug })
+    const savedBug = await bugService.save(newBug)
+    res.send({ savedBug })
 })
 
-app.get('/api/bug/:id', (req, res) => {
+app.get('/api/bug/:id', async (req, res) => {
     const bugId = req.params.id
-    const bug = bugs.find(bug => bug._id === bugId)
+    const bug = await bugService.getById(bugId)
     res.send(bug)
 })
 

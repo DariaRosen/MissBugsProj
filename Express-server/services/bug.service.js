@@ -1,4 +1,5 @@
 
+import { loggerService } from './logger.service.js'
 import { readJsonFile } from './util.service.js'
 import { writeJsonFile } from './util.service.js'
 // import Axios from 'axios'
@@ -25,6 +26,10 @@ async function query() {
 
 function getById(bugId) {
     const bug = bugs.find(b => b._id === bugId)
+    if (!bug) {
+        loggerService.warn(`Bug with ID ${bugId} not found`)
+        throw `Bug not found`
+    }
     return bug
 }
 async function remove(bugId) {

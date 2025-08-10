@@ -1,6 +1,7 @@
 import express from 'express'
 import { makeId } from './services/util.service.js'
 import { bugService } from './services/bug.service.js'
+import { loggerService } from './services/logger.service.js'
 
 const app = express()
 app.use(express.static('public'))
@@ -34,9 +35,15 @@ app.get('/api/bug/save', async (req, res) => {
 
 app.get('/api/bug/:id', async (req, res) => {
     const bugId = req.params.id
-    const bug = await bugService.getById(bugId)
-    res.send(bug)
+
+    try{
+        const bug = await bugService.getById(bugId)
+        res.send(bug)
+    } catch (error) {
+        loggerService.error('Error fetching bug:', error)
+        res.status(400).send({ error: 'Failed to fetch bug' })
+    }
 })
 
 const PORT = 3030
-app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`))
+app.listen(PORT, () => loggerService.info(`Server is running on http://localhost:${PORT}`))

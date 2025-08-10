@@ -1,3 +1,4 @@
+
 import { storageService } from './async-storage.service.js'
 import { utilService } from './util.service.js'
 import Axios from 'axios'
@@ -17,23 +18,20 @@ export const bugService = {
 }
 
 
-async function query() {
-    var res = await axios.get(BASE_URL)
-    var bugs = res.data
-    return bugs
+function query() {
+    var bugs = axios.get(BASE_URL)
+    return storageService.query(STORAGE_KEY)
 }
-async function getById(bugId) {
-    var res = await axios.get(`${BASE_URL}/${bugId}`)
-    return res.data
+function getById(bugId) {
+    return storageService.get(STORAGE_KEY, bugId)
 }
-async function remove(bugId) {
-    await axios.delete(`${BASE_URL}/${bugId}`)
+function remove(bugId) {
+    return storageService.remove(STORAGE_KEY, bugId)
 }
-
 function save(bug) {
     if (bug._id) {
-        return axios.put(`${BASE_URL}/${bug._id}`, bug)
+        return storageService.put(STORAGE_KEY, bug)
     } else {
-        return axios.post(BASE_URL, bug)
+        return storageService.post(STORAGE_KEY, bug)
     }
 }

@@ -1,12 +1,10 @@
-import { storageService } from './async-storage.service.js'
-import { utilService } from './util.service.js'
+
 import Axios from 'axios'
 
 var axios = Axios.create({
     withCredentials: true,
 })
 
-// const STORAGE_KEY = 'bugDB'
 const BASE_URL = '//localhost:3030/api/bug'
 
 export const bugService = {
@@ -18,22 +16,23 @@ export const bugService = {
 
 
 async function query() {
-    var res = await axios.get(BASE_URL)
-    var bugs = res.data
+    var { data: bugs } = await axios.get(BASE_URL)
     return bugs
 }
 async function getById(bugId) {
-    var res = await axios.get(`${BASE_URL}/${bugId}`)
+    const res = await axios.get(BASE_URL + '/' + bugId)
     return res.data
 }
 async function remove(bugId) {
-    await axios.delete(`${BASE_URL}/${bugId}`)
+    const res = await axios.get(BASE_URL + '/' + bugId + '/remove')
+    return res.data
 }
 
-function save(bug) {
-    if (bug._id) {
-        return axios.put(`${BASE_URL}/${bug._id}`, bug)
-    } else {
-        return axios.post(BASE_URL, bug)
-    }
+async function save(bug) {
+    const queryStr = `save?_id=${bug._id || ''}&title=${encodeURIComponent(bug.title)}&severity=${bug.severity}`
+    console.log(`${BASE_URL}/${queryStr}`)
+
+    const { data } = await axios.get(`${BASE_URL}/${queryStr}`)
+    return data // This will be your saved bug object
 }
+

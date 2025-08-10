@@ -3,6 +3,7 @@ import { makeId } from './services/util.service.js'
 import { bugService } from './services/bug.service.js'
 
 const app = express()
+app.use(express.static('public'))
 
 app.get('/', (req, res) => {
     res.send('Hello, World!!!')

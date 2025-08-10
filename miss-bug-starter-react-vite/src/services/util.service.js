@@ -1,14 +1,7 @@
-import fs from 'fs'
-import fr from 'follow-redirects'
-
-const { http, https } = fr
-
 export const utilService = {
     makeId,
     makeLorem,
-    getRandomIntInclusive,
-    readJsonFile,
-    writeJsonFile
+    getRandomIntInclusive
 }
 
 function makeId(length = 6) {
@@ -37,30 +30,3 @@ function getRandomIntInclusive(min, max) {
     max = Math.floor(max)
     return Math.floor(Math.random() * (max - min + 1)) + min //The maximum is inclusive and the minimum is inclusive 
 }
-
-function readJsonFile(filePath) {
-    try {
-        const str = fs.readFileSync(filePath, 'utf8')
-        const jsonData = JSON.parse(str)
-        return jsonData
-    } catch (err) {
-        console.error(`Error reading file from disk: ${err}`)
-        return []
-    }
-}
-
-function writeJsonFile(filePath, data) {
-   return new Promise((resolve, reject) => {
-        const jsonData = JSON.stringify(data, null, 2)
-
-        fs.writeFile(filePath, jsonData, 'utf8', (err) => {
-            if (err) {
-                console.error(`Error writing file to disk: ${err}`)
-                reject(err)
-            } else {
-                console.log('JSON file has been saved.')
-                resolve()
-            }
-        })
-    })  
-}   

@@ -44,9 +44,11 @@ export function BugIndex() {
       alert('Severity must be a number')
       return
     }
+
     const createdAt = Date.now()
+    const description = prompt('Bug description?') || ''
     try {
-      const savedBug = await bugService.save({ title, severity })
+      const savedBug = await bugService.save({ title, severity, createdAt, description })
       console.log('Added Bug', savedBug)
       setBugs(prevBugs => {
         const newBugs = [...prevBugs, savedBug]
@@ -61,27 +63,24 @@ export function BugIndex() {
   }
 
   async function onEditBug(bug) {
-    const severityStr = prompt('New severity? (number)', bug.severity)
-    if (severityStr === null) return // Cancel pressed
+    const severityStr = prompt('Bug severity?', bug.severity)
     const severity = Number(severityStr)
     if (isNaN(severity)) {
       alert('Severity must be a number')
       return
     }
 
-    const bugToSave = { ...bug, severity }
+    const description = prompt('Bug description?', bug.description || '')
+
+    const bugToSave = { ...bug, severity, description }
     try {
       const savedBug = await bugService.save(bugToSave)
       const updatedBug = savedBug.savedBug || savedBug
-      console.log('Updated Bug:', updatedBug)
-      setBugs(prevBugs => {
-        const newBugs = prevBugs.map(currBug =>
+      setBugs(prevBugs =>
+        prevBugs.map(currBug =>
           currBug._id === updatedBug._id ? updatedBug : currBug
         )
-        console.log('Updated bugs after edit:', newBugs)
-        return newBugs
-      })
-      
+      )
       showSuccessMsg('Bug updated')
     } catch (err) {
       console.log('Error from onEditBug ->', err)

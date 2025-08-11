@@ -38,8 +38,8 @@ app.get('/api/bug/:id/remove', async (req, res) => {
 })
 
 app.get('/api/bug/save', async (req, res) => {
-    const { _id, title, severity, createdAt } = req.query
-    const newBug = { _id, title, severity: +severity, createdAt: +createdAt }
+    const { _id, title, severity, createdAt, description } = req.query
+    const newBug = { _id, title, severity: +severity, createdAt: +createdAt, description }
     console.log('Saving bug:', newBug)
     const savedBug = await bugService.save(newBug)
     res.send({ savedBug })

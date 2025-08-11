@@ -47,9 +47,14 @@ export function BugIndex() {
 
     const createdAt = Date.now()
     const description = prompt('Bug description?') || ''
+
+    console.log('Adding Bug with title:', title, 'severity:', severity, 'createdAt:', createdAt, 'description:', description);
+
     try {
-      const savedBug = await bugService.save({ title, severity, createdAt, description })
+      const res = await bugService.save({ title, severity, createdAt, description })
+      const savedBug = res.savedBug || res   // unwrap if backend wraps it
       console.log('Added Bug', savedBug)
+
       setBugs(prevBugs => {
         const newBugs = [...prevBugs, savedBug]
         console.log('Updated bugs after addition:', newBugs)
@@ -74,8 +79,8 @@ export function BugIndex() {
 
     const bugToSave = { ...bug, severity, description }
     try {
-      const savedBug = await bugService.save(bugToSave)
-      const updatedBug = savedBug.savedBug || savedBug
+      const res = await bugService.save(bugToSave)
+      const updatedBug = res.savedBug || res
       setBugs(prevBugs =>
         prevBugs.map(currBug =>
           currBug._id === updatedBug._id ? updatedBug : currBug

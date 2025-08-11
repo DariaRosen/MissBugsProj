@@ -38,17 +38,39 @@ app.get('/api/bug/:id/remove', async (req, res) => {
 })
 
 app.get('/api/bug/save', async (req, res) => {
-    const { _id, title, severity, createdAt, description } = req.query
-    const newBug = { _id, title, severity: +severity, createdAt: +createdAt, description }
-    console.log('Saving bug:', newBug)
-    const savedBug = await bugService.save(newBug)
-    res.send({ savedBug })
+    try {
+        let { _id, title, severity, createdAt, description } = req.query
+
+        const bugToSave = {
+            title,
+            severity: +severity,
+            description: description || '',
+            createdAt: createdAt ? +createdAt : Date.now()
+        }
+
+        if (_id && _id.trim() !== '') {
+            // Editing existing bug
+            bugToSave._id = _id
+        } else {
+            // Creating new bug
+            bugToSave._id = makeId()
+        }
+
+        console.log('Saving bug:', bugToSave)
+
+        const savedBug = await bugService.save(bugToSave)
+        res.send({ savedBug })
+    } catch (err) {
+        console.error('Error saving bug:', err)
+        res.status(500).send({ err: 'Failed to save bug' })
+    }
 })
+
 
 app.get('/api/bug/:id', async (req, res) => {
     const bugId = req.params.id
 
-    try{
+    try {
         const bug = await bugService.getById(bugId)
         res.send(bug)
     } catch (error) {

@@ -40,16 +40,20 @@ async function remove(bugId) {
 }
 
 async function save(bugToSave) {
-    if (bugToSave._id) {
-        const idx = bugs.findIndex(b => b._id === bugToSave._id)
-        bugs.splice(idx, 1, bugToSave)
+    const bugs = readJsonFile('./data/bugs.json') // fresh copy
+
+    const idx = bugs.findIndex(b => b._id === bugToSave._id)
+    if (idx >= 0) {
+        bugs[idx] = bugToSave // update existing
     } else {
-        bugToSave._id = makeId()
-        bugs.push(bugToSave)
+        bugToSave._id = bugToSave._id || makeId()
+        bugs.push(bugToSave) // add new
     }
-    await _saveBugs()
+
+    await writeJsonFile('./data/bugs.json', bugs)
     return bugToSave
 }
+
 
 function _saveBugs() {
     return writeJsonFile('data/bugs.json', bugs)

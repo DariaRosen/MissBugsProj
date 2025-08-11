@@ -44,6 +44,7 @@ export function BugIndex() {
       alert('Severity must be a number')
       return
     }
+    const createdAt = Date.now()
     try {
       const savedBug = await bugService.save({ title, severity })
       console.log('Added Bug', savedBug)
@@ -71,9 +72,7 @@ export function BugIndex() {
     const bugToSave = { ...bug, severity }
     try {
       const savedBug = await bugService.save(bugToSave)
-      // If your service wraps bug in savedBug.savedBug, fix here:
       const updatedBug = savedBug.savedBug || savedBug
-
       console.log('Updated Bug:', updatedBug)
       setBugs(prevBugs => {
         const newBugs = prevBugs.map(currBug =>
@@ -82,6 +81,7 @@ export function BugIndex() {
         console.log('Updated bugs after edit:', newBugs)
         return newBugs
       })
+      
       showSuccessMsg('Bug updated')
     } catch (err) {
       console.log('Error from onEditBug ->', err)

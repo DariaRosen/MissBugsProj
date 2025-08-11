@@ -29,7 +29,7 @@ async function remove(bugId) {
 }
 
 async function save(bug) {
-    const queryStr = `save?_id=${bug._id || ''}&title=${encodeURIComponent(bug.title)}&severity=${bug.severity}`
+    const queryStr = `save?_id=${bug._id || ''}&title=${encodeURIComponent(bug.title)}&severity=${bug.severity}&createdAt=${bug.createdAt}`
     console.log(`${BASE_URL}/${queryStr}`)
 
     const { data } = await axios.get(`${BASE_URL}/${queryStr}`)

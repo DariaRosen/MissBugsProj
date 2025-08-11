@@ -7,6 +7,8 @@ export function BugPreview({ bug }) {
             <h1>🐛</h1>
             <p>
                 Severity: <span>{bug.severity}</span>
+                <br />
+                Created At: <span>{new Date(bug.createdAt).toLocaleDateString()}</span>
             </p>
         </article>
     )

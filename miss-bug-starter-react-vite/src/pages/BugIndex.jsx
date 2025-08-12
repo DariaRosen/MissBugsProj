@@ -1,4 +1,3 @@
-// BugIndex.jsx
 import { useState, useEffect } from 'react'
 import { bugService } from '../services/bug.service.js'
 import { showSuccessMsg, showErrorMsg } from '../services/event-bus.service.js'
@@ -6,100 +5,119 @@ import { BugList } from '../cmps/BugList.jsx'
 
 export function BugIndex() {
   const [bugs, setBugs] = useState([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [newBug, setNewBug] = useState({
+    title: '',
+    severity: '',
+    description: '',
+    labels: []
+  })
 
-  console.log('BugIndex rendered. Current bugs:', bugs)
+  const availableLabels = ['critical', 'major', 'minor', 'need-CR', 'dev-branch', 'main-branch']
 
   useEffect(() => {
     loadBugs()
   }, [])
 
+  function toggleModal() {
+    setIsModalOpen(prev => !prev)
+  }
+
+  function handleChange({ target }) {
+    const { name, value } = target
+    setNewBug(prev => ({ ...prev, [name]: value }))
+  }
+
+  function handleLabelChange({ target }) {
+    const selected = Array.from(target.selectedOptions).map(opt => opt.value)
+    setNewBug(prev => ({ ...prev, labels: selected }))
+  }
+
   async function loadBugs() {
     const bugsFromService = await bugService.query()
-    console.log('Loaded bugs from service:', bugsFromService)
-    setBugs(bugsFromService)
+    setBugs(bugsFromService.map(bug => ({
+      ...bug,
+      labels: Array.isArray(bug.labels) ? bug.labels : []
+    })))
   }
 
   async function onRemoveBug(bugId) {
     try {
       await bugService.remove(bugId)
-      console.log('Deleted Successfully! bugId:', bugId)
-      setBugs(prevBugs => {
-        const newBugs = prevBugs.filter(bug => bug._id !== bugId)
-        console.log('Updated bugs after removal:', newBugs)
-        return newBugs
-      })
+      setBugs(prevBugs => prevBugs.filter(bug => bug._id !== bugId))
       showSuccessMsg('Bug removed')
     } catch (err) {
-      console.log('Error from onRemoveBug ->', err)
       showErrorMsg('Cannot remove bug')
     }
   }
 
-  async function onAddBug() {
-    const title = prompt('Bug title?')
-    if (!title) return
-    const severityStr = prompt('Bug severity? (number)')
-    const severity = Number(severityStr)
-    if (isNaN(severity)) {
-      alert('Severity must be a number')
-      return
-    }
-
-    const createdAt = Date.now()
-    const description = prompt('Bug description?') || ''
-
-    console.log('Adding Bug with title:', title, 'severity:', severity, 'createdAt:', createdAt, 'description:', description);
-
+  async function saveBug(ev) {
+    ev.preventDefault()
     try {
-      const res = await bugService.save({ title, severity, createdAt, description })
-      const savedBug = res.savedBug || res   // unwrap if backend wraps it
-      console.log('Added Bug', savedBug)
-
-      setBugs(prevBugs => {
-        const newBugs = [...prevBugs, savedBug]
-        console.log('Updated bugs after addition:', newBugs)
-        return newBugs
+      const savedBug = await bugService.save({
+        ...newBug,
+        severity: Number(newBug.severity)
       })
-      showSuccessMsg('Bug added')
+      setBugs(prev => [...prev, savedBug])
+      showSuccessMsg('Bug added successfully!')
+      toggleModal()
+      setNewBug({ title: '', severity: '', description: '', labels: [] })
     } catch (err) {
-      console.log('Error from onAddBug ->', err)
+      console.error(err)
       showErrorMsg('Cannot add bug')
     }
   }
 
-  async function onEditBug(bug) {
-    const severityStr = prompt('Bug severity?', bug.severity)
-    const severity = Number(severityStr)
-    if (isNaN(severity)) {
-      alert('Severity must be a number')
-      return
-    }
-
-    const description = prompt('Bug description?', bug.description || '')
-
-    const bugToSave = { ...bug, severity, description }
-    try {
-      const res = await bugService.save(bugToSave)
-      const updatedBug = res.savedBug || res
-      setBugs(prevBugs =>
-        prevBugs.map(currBug =>
-          currBug._id === updatedBug._id ? updatedBug : currBug
-        )
-      )
-      showSuccessMsg('Bug updated')
-    } catch (err) {
-      console.log('Error from onEditBug ->', err)
-      showErrorMsg('Cannot update bug')
-    }
-  }
-
   return (
-    <main className="main-layout">
-      <h3>Bugs App</h3>
-      <main>
-        <button onClick={onAddBug}>Add Bug ⛐</button>
-        <BugList bugs={bugs} onRemoveBug={onRemoveBug} onEditBug={onEditBug} />
-      </main>
-    </main>
+    <section>
+      <button onClick={toggleModal}>Add Bug</button>
+
+      {isModalOpen && (
+        <div className="modal-backdrop">
+          <div className="modal">
+            <h3>Add New Bug</h3>
+            <form onSubmit={saveBug}>
+              <input
+                type="text"
+                name="title"
+                value={newBug.title}
+                placeholder="Bug title"
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="number"
+                name="severity"
+                value={newBug.severity}
+                placeholder="Severity"
+                onChange={handleChange}
+                required
+              />
+              <textarea
+                name="description"
+                value={newBug.description}
+                placeholder="Description"
+                onChange={handleChange}
+              />
+              <select
+                name="labels"
+                multiple
+                value={newBug.labels}
+                onChange={handleLabelChange}
+              >
+                {availableLabels.map(label => (
+                  <option key={label} value={label}>{label}</option>
+                ))}
+              </select>
+
+              <button type="submit">Save</button>
+              <button type="button" onClick={toggleModal}>Cancel</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <BugList bugs={bugs} onRemoveBug={onRemoveBug} />
+    </section>
   )
 }

@@ -6,7 +6,6 @@ import { useParams } from 'react-router'
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
-
 export function BugDetails() {
 
     const [bug, setBug] = useState(null)
@@ -33,6 +32,7 @@ export function BugDetails() {
         <p>Severity: <span>{bug.severity}</span></p>
         <p>Description: <span>{bug.description}</span></p>
         <p>Created At: <span>{new Date(bug.createdAt).toLocaleDateString()}</span></p>
+        <p>Labels: <span>{bug.labels?.join(', ') || 'No labels'}</span></p>
         <Link to="/bug">Back to List</Link>
     </div>
 

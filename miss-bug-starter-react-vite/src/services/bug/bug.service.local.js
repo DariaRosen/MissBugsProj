@@ -1,6 +1,6 @@
 
-import { storageService } from './async-storage.service.js'
-import { utilService } from './util.service.js'
+import { storageService } from '../async-storage.service.js'
+import { utilService } from '../util.service.js'
 import Axios from 'axios'
 
 var axios = Axios.create({

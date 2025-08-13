@@ -44,25 +44,36 @@ function getById(bugId) {
     return bug
 }
 async function remove(bugId) {
-    const idx = bugs.findIndex(b => b._id === bugId)
-    bugs.splice(idx, 1)
+    try {
+        const idx = bugs.findIndex(b => b._id === bugId)
+        bugs.splice(idx, 1)
+
+    } catch (err) {
+        loggerService.error('Error removing bug:', err)
+        throw err
+    }
 
     return _saveBugs()
 }
 
 async function save(bugToSave) {
     const bugs = readJsonFile('./data/bugs.json') // fresh copy
+    try {
+        const idx = bugs.findIndex(b => b._id === bugToSave._id)
+        if (idx >= 0) {
+            bugs[idx] = bugToSave // update existing
+        } else {
+            bugToSave._id = bugToSave._id || makeId()
+            bugs.push(bugToSave) // add new
+        }
 
-    const idx = bugs.findIndex(b => b._id === bugToSave._id)
-    if (idx >= 0) {
-        bugs[idx] = bugToSave // update existing
-    } else {
-        bugToSave._id = bugToSave._id || makeId()
-        bugs.push(bugToSave) // add new
+        await writeJsonFile('./data/bugs.json', bugs)
+        return bugToSave
     }
-
-    await writeJsonFile('./data/bugs.json', bugs)
-    return bugToSave
+    catch (err) {
+        loggerService.error('Error saving bug:', err)
+        throw err
+    }
 }
 
 

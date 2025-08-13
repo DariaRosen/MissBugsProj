@@ -22,10 +22,6 @@ app.get('/', (req, res) => {
     res.send('Hello, World!!!')
 })
 
-app.get('/puki', (req, res) => {
-    res.send('Puki is here!')
-})
-
 app.get('/api/bug', async (req, res) => {
     const { title, minSeverity } = req.query
     const filterBy = {
@@ -44,8 +40,13 @@ app.get('/api/bug', async (req, res) => {
 
 app.get('/api/bug/:id/remove', async (req, res) => {
     const bugId = req.params.id
-    await bugService.remove(bugId)
-    res.send({ message: 'Bug removed successfully' })
+    try {
+        await bugService.remove(bugId)
+        res.send({ message: 'Bug removed successfully' })
+    } catch (err) {
+        loggerService.error('Error removing bug:', err)
+        res.status(500).send({ error: 'Failed to remove bug' })
+    }
 })
 
 app.get('/api/bug/save', async (req, res) => {

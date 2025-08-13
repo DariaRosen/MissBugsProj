@@ -15,24 +15,46 @@ export const bugService = {
 }
 
 
-async function query() {
-    var { data: bugs } = await axios.get(BASE_URL)
-    return bugs
+async function query(filterBy = {}) {
+    try {
+        var { data: bugs } = await axios.get(BASE_URL, { params: filterBy })
+        return bugs
+    } catch (err) {
+        console.error(err)
+        throw new Error('Cannot load bugs')
+    }
 }
 async function getById(bugId) {
-    const res = await axios.get(BASE_URL + '/' + bugId)
-    return res.data
+    try {
+        const res = await axios.get(BASE_URL + '/' + bugId)
+        return res.data
+    } catch (err) {
+        console.error(err)
+        throw new Error('Cannot load bug')
+    }
 }
 async function remove(bugId) {
-    const res = await axios.get(BASE_URL + '/' + bugId + '/remove')
-    return res.data
+    // const res = await axios.get(BASE_URL + '/' + bugId + '/remove')
+    const url = BASE_URL + '/remove'
+    try {
+        const { data: res } = await axios.get(url)
+        return res.data
+    } catch (err) {
+        console.error(err)
+        throw new Error('Cannot remove bug')
+    }
 }
 
-async function save(bug) {
-    const queryStr = `save?_id=${bug._id || ''}&title=${encodeURIComponent(bug.title)}&severity=${bug.severity}&createdAt=${bug.createdAt}&description=${encodeURIComponent(bug.description || '')}`
-    console.log(`${BASE_URL}/${queryStr}`)
+async function save(carToSave) {
+    let url = BASE_URL + '/save'
+    try {
+        // const queryStr = `save?_id=${bug._id || ''}&title=${encodeURIComponent(bug.title)}&severity=${bug.severity}&createdAt=${bug.createdAt}&description=${encodeURIComponent(bug.description || '')}`
+        // console.log(`${BASE_URL}/${queryStr}`)
 
-    const { data } = await axios.get(`${BASE_URL}/${queryStr}`)
-    return data // This will be your saved bug object
+        const { data: savedBug } = await axios.get(url, { params: carToSave })
+        return savedBug // This will be your saved bug object
+    } catch (err) {
+        console.error(err)
+        throw new Error('Cannot save bug')
+    }
 }
-

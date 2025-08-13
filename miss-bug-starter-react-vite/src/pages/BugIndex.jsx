@@ -6,18 +6,39 @@ import { BugList } from '../cmps/BugList.jsx'
 export function BugIndex() {
   const [bugs, setBugs] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [newBug, setNewBug] = useState({
-    title: '',
-    severity: '',
-    description: '',
-    labels: []
-  })
+  const [newBug, setNewBug] = useState(getEmptyBug())
+  const [filterBy, setFilterBy] = useState({ title: '', minSeverity: 0 })
 
-  const availableLabels = ['critical', 'major', 'minor', 'need-CR', 'dev-branch', 'main-branch']
+  const availableLabels = [
+    'critical',
+    'major',
+    'minor',
+    'need-CR',
+    'dev-branch',
+    'main-branch'
+  ]
 
   useEffect(() => {
     loadBugs()
-  }, [])
+  }, [filterBy])
+
+  function getEmptyBug() {
+    return { title: '', severity: '', description: '', labels: [] }
+  }
+
+  async function loadBugs() {
+    try {
+      const bugsFromService = await bugService.query(filterBy)
+      setBugs(
+        bugsFromService.map(bug => ({
+          ...bug,
+          labels: Array.isArray(bug.labels) ? bug.labels : []
+        }))
+      )
+    } catch (err) {
+      console.error('Failed to load bugs', err)
+    }
+  }
 
   function toggleModal() {
     setIsModalOpen(prev => !prev)
@@ -29,22 +50,19 @@ export function BugIndex() {
   }
 
   function handleLabelChange({ target }) {
-    const selected = Array.from(target.selectedOptions).map(opt => opt.value)
-    setNewBug(prev => ({ ...prev, labels: selected }))
+    const selectedLabels = Array.from(target.selectedOptions, opt => opt.value)
+    setNewBug(prev => ({ ...prev, labels: selectedLabels }))
   }
 
-  async function loadBugs() {
-    const bugsFromService = await bugService.query()
-    setBugs(bugsFromService.map(bug => ({
-      ...bug,
-      labels: Array.isArray(bug.labels) ? bug.labels : []
-    })))
+  function handleFilterChange({ target }) {
+    const { name, value } = target
+    setFilterBy(prev => ({ ...prev, [name]: value }))
   }
 
   async function onRemoveBug(bugId) {
     try {
       await bugService.remove(bugId)
-      setBugs(prevBugs => prevBugs.filter(bug => bug._id !== bugId))
+      setBugs(prev => prev.filter(bug => bug._id !== bugId))
       showSuccessMsg('Bug removed')
     } catch (err) {
       showErrorMsg('Cannot remove bug')
@@ -54,14 +72,13 @@ export function BugIndex() {
   async function saveBug(ev) {
     ev.preventDefault()
     try {
-      const savedBug = await bugService.save({
-        ...newBug,
-        severity: Number(newBug.severity)
-      })
+      const bugToSave = { ...newBug, severity: Number(newBug.severity) }
+      const savedBug = await bugService.save(bugToSave)
+
       setBugs(prev => [...prev, savedBug])
       showSuccessMsg('Bug added successfully!')
+      setNewBug(getEmptyBug())
       toggleModal()
-      setNewBug({ title: '', severity: '', description: '', labels: [] })
     } catch (err) {
       console.error(err)
       showErrorMsg('Cannot add bug')
@@ -70,8 +87,27 @@ export function BugIndex() {
 
   return (
     <section>
+
       <button onClick={toggleModal}>Add Bug</button>
 
+      {/* Filter Controls */}
+      <section className="filters">
+        <input
+          type="text"
+          name="title"
+          value={filterBy.title}
+          placeholder="Filter by title"
+          onChange={handleFilterChange}
+        />
+        <input
+          type="number"
+          name="minSeverity"
+          value={filterBy.minSeverity}
+          placeholder="Min severity"
+          onChange={handleFilterChange}
+        />
+      </section>
+      {/* Modal */}
       {isModalOpen && (
         <div className="modal-backdrop">
           <div className="modal">
@@ -106,17 +142,24 @@ export function BugIndex() {
                 onChange={handleLabelChange}
               >
                 {availableLabels.map(label => (
-                  <option key={label} value={label}>{label}</option>
+                  <option key={label} value={label}>
+                    {label}
+                  </option>
                 ))}
               </select>
 
-              <button type="submit">Save</button>
-              <button type="button" onClick={toggleModal}>Cancel</button>
+              <div className="modal-actions">
+                <button type="submit">Save</button>
+                <button type="button" onClick={toggleModal}>
+                  Cancel
+                </button>
+              </div>
             </form>
           </div>
         </div>
       )}
 
+      {/* Bug List */}
       <BugList bugs={bugs} onRemoveBug={onRemoveBug} />
     </section>
   )

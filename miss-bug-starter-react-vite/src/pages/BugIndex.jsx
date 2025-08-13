@@ -22,6 +22,14 @@ export function BugIndex() {
     loadBugs()
   }, [filterBy])
 
+  function onSetFilterBy(filterBy) {
+    setFilterBy(prevFilter => {
+      let pageIdx = undefined
+      if (filterBy.pageIdx !== undefined) pageIdx = 0
+      return { ...prevFilter, ...filterBy, pageIdx }
+    })
+  }
+
   function getEmptyBug() {
     return { title: '', severity: '', description: '', labels: [] }
   }
@@ -77,7 +85,6 @@ export function BugIndex() {
     toggleModal()
   }
 
-
   async function saveBug(ev) {
     ev.preventDefault()
     try {
@@ -105,6 +112,32 @@ export function BugIndex() {
     }
   }
 
+  async function onChangePageIdx(pageIdx) {
+    if (pageIdx < 0) return
+    setFilterBy(prevFilter => ({ ...prevFilter, pageIdx }))
+
+    if (!bugs) return <div>Loading...</div>
+
+    const { pageIdx: currentPageIdx, ...filterBy } = filterBy
+    const isPaging = currentPageIdx !== undefined
+    return (
+      <section className="bug-index">
+        <div className="bug-pagination">
+          <label>Use Paging:
+            <input type="checkbox" checked={isPaging} onChange={() => onChangePageId(isPaging ? undefined : 0)} />
+          </label>
+          {isPaging && <>
+            <button onClick={() => onChangePageIdx(pageIdx - 1)} >-</button>
+            <span> {pageIdx + 1}</span>
+            <button onClick={() => onChangePageIdx(pageIdx + 1)} >+</button>
+          </>}
+        </div>
+        <BugFilter filterBy={restOfFilter} onSetFilterBy={onSetFilterBy} />
+        <Link to="bug/edit" className="edit-bug-link">Add Bug</Link>
+        <BugList bugs={bugs} onRemoveBug={onRemoveBug} onEditBug={onEditBug} />
+      </section>
+    )
+  }
 
   return (
     <section>
@@ -132,7 +165,7 @@ export function BugIndex() {
       {isModalOpen && (
         <div className="modal-backdrop">
           <div className="modal">
-            <h3>Add New Bug</h3>
+            <h3>{newBug._id ? 'Edit Bug' : 'Add New Bug'}</h3>
             <form onSubmit={saveBug}>
               <input
                 type="text"
@@ -185,3 +218,4 @@ export function BugIndex() {
     </section>
   )
 }
+

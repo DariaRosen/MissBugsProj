@@ -3,6 +3,7 @@ import { makeId } from './services/util.service.js'
 import { bugService } from './services/bug.service.js'
 import { loggerService } from './services/logger.service.js'
 import cors from 'cors'
+import coockieParser from 'cookie-parser'
 
 const app = express()
 app.use(express.static('public'))
@@ -17,7 +18,7 @@ const corsOptions = {
     credentials: true,
 }
 app.use(cors(corsOptions))
-
+app.use(coockieParser())
 app.get('/', (req, res) => {
     res.send('Hello, World!!!')
 })
@@ -78,10 +79,44 @@ app.get('/api/bug/save', async (req, res) => {
     }
 })
 
+app.get('/cookie', (req, res) => {
+    let visitCount = req.cookies.myCookie || 0
+    visitCount++
+
+    res.cookie('myCookie', visitCount)
+    res.send(`Cookie value: ${visitCount}`)
+})
 
 app.get('/api/bug/:id', async (req, res) => {
     const bugId = req.params.id
 
+    // Read visitedBugs cookie or default to empty array
+    let visitedBugs = []
+    try {
+        if (req.cookies.visitedBugs) {
+            visitedBugs = JSON.parse(req.cookies.visitedBugs)
+        }
+    } catch (err) {
+        console.error('Failed to parse visitedBugs cookie', err)
+    }
+
+    // If bug not already visited, add it
+    if (!visitedBugs.includes(bugId)) {
+        visitedBugs.push(bugId)
+    }
+
+    // Log for debugging
+    console.log('User visited the following bugs:', visitedBugs)
+
+    // Save updated visitedBugs cookie with 7-second lifetime
+    res.cookie('visitedBugs', JSON.stringify(visitedBugs), { maxAge: 7000, httpOnly: true })
+
+    // Check if the user exceeded the limit
+    if (visitedBugs.length > 3) {
+        return res.status(401).send('Wait for a bit')
+    }
+
+    // Fetch and return bug
     try {
         const bug = await bugService.getById(bugId)
         res.send(bug)
@@ -90,6 +125,7 @@ app.get('/api/bug/:id', async (req, res) => {
         res.status(400).send({ error: 'Failed to fetch bug' })
     }
 })
+
 
 const PORT = 3030
 app.listen(PORT, () => loggerService.info(`Server is running on http://localhost:${PORT}`))

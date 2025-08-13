@@ -1,4 +1,3 @@
-// BugList.jsx
 import { Link } from 'react-router-dom'
 import { BugPreview } from './BugPreview'
 

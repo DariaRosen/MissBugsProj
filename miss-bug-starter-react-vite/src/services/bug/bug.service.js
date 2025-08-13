@@ -34,10 +34,9 @@ async function getById(bugId) {
     }
 }
 async function remove(bugId) {
-    // const res = await axios.get(BASE_URL + '/' + bugId + '/remove')
-    const url = BASE_URL + '/remove'
+    const url = BASE_URL + '/' + bugId
     try {
-        const { data: res } = await axios.get(url)
+        const { data: res } = await axios.delete(url)
         return res.data
     } catch (err) {
         console.error(err)
@@ -45,14 +44,18 @@ async function remove(bugId) {
     }
 }
 
-async function save(carToSave) {
-    let url = BASE_URL + '/save'
+async function save(bugToSave) {
+    const url = BASE_URL + '/' + bugToSave._id
     try {
-        // const queryStr = `save?_id=${bug._id || ''}&title=${encodeURIComponent(bug.title)}&severity=${bug.severity}&createdAt=${bug.createdAt}&description=${encodeURIComponent(bug.description || '')}`
-        // console.log(`${BASE_URL}/${queryStr}`)
+        if (bugToSave._id) { // Update existing bug
+            const { data: updatedBug } = await axios.put(url, bugToSave)
+            return updatedBug
+        }
+        else { // Create new bug
+            const { data: savedBug } = await axios.post(BASE_URL, bugToSave)
+            return savedBug // This will be your saved bug object
+        }
 
-        const { data: savedBug } = await axios.get(url, { params: carToSave })
-        return savedBug // This will be your saved bug object
     } catch (err) {
         console.error(err)
         throw new Error('Cannot save bug')

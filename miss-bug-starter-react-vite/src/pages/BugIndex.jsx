@@ -69,21 +69,42 @@ export function BugIndex() {
     }
   }
 
+  function onEditBug(bug) {
+    setNewBug({
+      ...bug,
+      labels: Array.isArray(bug.labels) ? bug.labels : []
+    })
+    toggleModal()
+  }
+
+
   async function saveBug(ev) {
     ev.preventDefault()
     try {
       const bugToSave = { ...newBug, severity: Number(newBug.severity) }
       const savedBug = await bugService.save(bugToSave)
 
-      setBugs(prev => [...prev, savedBug])
-      showSuccessMsg('Bug added successfully!')
+      setBugs(prev => {
+        const idx = prev.findIndex(b => b._id === savedBug._id)
+        if (idx > -1) {
+          // update existing bug
+          const copy = [...prev]
+          copy[idx] = savedBug
+          return copy
+        }
+        // add new bug
+        return [...prev, savedBug]
+      })
+
+      showSuccessMsg('Bug saved successfully!')
       setNewBug(getEmptyBug())
       toggleModal()
     } catch (err) {
       console.error(err)
-      showErrorMsg('Cannot add bug')
+      showErrorMsg('Cannot save bug')
     }
   }
+
 
   return (
     <section>
@@ -160,7 +181,7 @@ export function BugIndex() {
       )}
 
       {/* Bug List */}
-      <BugList bugs={bugs} onRemoveBug={onRemoveBug} />
+      <BugList bugs={bugs} onRemoveBug={onRemoveBug} onEditBug={onEditBug} />
     </section>
   )
 }

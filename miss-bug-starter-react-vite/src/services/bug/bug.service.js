@@ -45,17 +45,14 @@ async function remove(bugId) {
 }
 
 async function save(bugToSave) {
-    const url = BASE_URL + '/' + bugToSave._id
     try {
         if (bugToSave._id) { // Update existing bug
-            const { data: updatedBug } = await axios.put(url, bugToSave)
-            return updatedBug
+            const { data } = await axios.put(`${BASE_URL}/${bugToSave._id}`, bugToSave)
+            return data.savedBug
+        } else { // Create new bug
+            const { data } = await axios.post(BASE_URL, bugToSave)
+            return data.savedBug
         }
-        else { // Create new bug
-            const { data: savedBug } = await axios.post(BASE_URL, bugToSave)
-            return savedBug // This will be your saved bug object
-        }
-
     } catch (err) {
         console.error(err)
         throw new Error('Cannot save bug')

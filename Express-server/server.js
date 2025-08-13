@@ -19,6 +19,7 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 app.use(coockieParser())
+app.use(express.json())
 app.get('/', (req, res) => {
     res.send('Hello, World!!!')
 })
@@ -39,7 +40,7 @@ app.get('/api/bug', async (req, res) => {
     }
 })
 
-app.get('/api/bug/:id/remove', async (req, res) => {
+app.delete('/api/bug/:id', async (req, res) => {
     const bugId = req.params.id
     try {
         await bugService.remove(bugId)
@@ -50,9 +51,31 @@ app.get('/api/bug/:id/remove', async (req, res) => {
     }
 })
 
-app.get('/api/bug/save', async (req, res) => {
+app.post('/api/bug', async (req, res) => {
     try {
-        let { _id, title, severity, createdAt, description } = req.query
+        let { title, severity, createdAt, description } = req.body
+
+        const bugToSave = {
+            title,
+            severity: +severity,
+            description: description || '',
+            createdAt: createdAt ? +createdAt : Date.now()
+        }
+        bugToSave._id = makeId()
+
+        console.log('New bug:', bugToSave)
+
+        const savedBug = await bugService.save(bugToSave)
+        res.send({ savedBug })
+    } catch (err) {
+        console.error('Error saving bug:', err)
+        res.status(500).send({ err: 'Failed to save bug' })
+    }
+})
+
+app.put('/api/bug/:id', async (req, res) => {
+    try {
+        let { _id, title, severity, createdAt, description } = req.body
 
         const bugToSave = {
             title,

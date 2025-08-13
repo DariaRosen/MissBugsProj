@@ -27,8 +27,19 @@ app.get('/puki', (req, res) => {
 })
 
 app.get('/api/bug', async (req, res) => {
-    const bugs = await bugService.query()
-    res.send(bugs)
+    const { title, minSeverity } = req.query
+    const filterBy = {
+        title: title || '',
+        minSeverity: minSeverity ? +minSeverity : 0
+    }
+    try {
+        const bugs = await bugService.query(filterBy)
+        res.send(bugs)
+    }
+    catch (err) {
+        loggerService.error('Error fetching bugs:', err)
+        res.status(500).send({ error: 'Failed to fetch bugs' })
+    }
 })
 
 app.get('/api/bug/:id/remove', async (req, res) => {

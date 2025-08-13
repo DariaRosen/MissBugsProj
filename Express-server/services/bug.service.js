@@ -18,10 +18,21 @@ export const bugService = {
     save,
 }
 
-async function query() {
-    // var res = await gAxios.get(BASE_URL)
-    // var bugs = res.data
-    return bugs
+async function query(filterBy) {
+    let bugsToDisplay = bugs
+    try {
+        if (filterBy.title) {
+            const regex = new RegExp(filterBy.title, 'i')
+            bugsToDisplay = bugsToDisplay.filter(bug => regex.test(bug.title))
+        }
+        if (filterBy.minSeverity) {
+            bugsToDisplay = bugsToDisplay.filter(bug => bug.severity >= filterBy.minSeverity)
+        }
+    } catch (err) {
+        loggerService.error('Error fetching bugs:', err)
+        throw err
+    }
+    return bugsToDisplay
 }
 
 function getById(bugId) {

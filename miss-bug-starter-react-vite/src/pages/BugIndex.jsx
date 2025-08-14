@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { bugService } from '../services/bug'
 import { showSuccessMsg, showErrorMsg } from '../services/event-bus.service.js'
 import { BugList } from '../cmps/BugList.jsx'
+import { BugFilter } from '../cmps/BugFilter.jsx'
 
 export function BugIndex() {
   const [bugs, setBugs] = useState([])
@@ -19,31 +20,24 @@ export function BugIndex() {
   ]
 
   const [filterBy, setFilterBy] = useState(() => {
-    // Load filterBy from localStorage if exists, otherwise default
     const saved = localStorage.getItem('bugFilterBy')
     return saved ? JSON.parse(saved) : { title: '', minSeverity: 0, pageIdx: undefined }
   })
 
-  // Save filterBy to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('bugFilterBy', JSON.stringify(filterBy))
     loadBugs()
-  }, [filterBy])
-
-  useEffect(() => {
-    loadBugs(filterBy)
   }, [filterBy])
 
   function getEmptyBug() {
     return { title: '', severity: '', description: '', labels: [] }
   }
 
-  async function loadBugs(currentFilter) {
+  async function loadBugs(currentFilter = filterBy) {
     try {
       const bugsFromService = await bugService.query(currentFilter)
       let pagedBugs = bugsFromService
 
-      // Only slice if paging is enabled
       if (currentFilter.pageIdx !== undefined) {
         const pageIdx = currentFilter.pageIdx
         pagedBugs = bugsFromService.slice(
@@ -63,7 +57,6 @@ export function BugIndex() {
     }
   }
 
-
   function toggleModal() {
     setIsModalOpen(prev => !prev)
   }
@@ -76,11 +69,6 @@ export function BugIndex() {
   function handleLabelChange({ target }) {
     const selectedLabels = Array.from(target.selectedOptions, opt => opt.value)
     setNewBug(prev => ({ ...prev, labels: selectedLabels }))
-  }
-
-  function handleFilterChange({ target }) {
-    const { name, value } = target
-    setFilterBy(prev => ({ ...prev, [name]: value, pageIdx: 0 }))
   }
 
   async function onRemoveBug(bugId) {
@@ -110,12 +98,10 @@ export function BugIndex() {
       setBugs(prev => {
         const idx = prev.findIndex(b => b._id === savedBug._id)
         if (idx > -1) {
-          // update existing bug
           const copy = [...prev]
           copy[idx] = savedBug
           return copy
         }
-        // add new bug
         return [...prev, savedBug]
       })
 
@@ -168,36 +154,6 @@ export function BugIndex() {
 
       <button onClick={toggleModal}>Add Bug</button>
 
-      {/* FILTERS */}
-      <section className="filters">
-        <input
-          type="text"
-          name="title"
-          value={filterBy.title}
-          placeholder="Filter by title"
-          onChange={handleFilterChange}
-        />
-        <input
-          type="number"
-          name="minSeverity"
-          value={filterBy.minSeverity}
-          placeholder="Min severity"
-          onChange={handleFilterChange}
-        />
-        <select
-          name="labels"
-          value={filterBy.labels || ''}
-          onChange={handleFilterChange}
-        >
-          <option value="">All Labels</option>
-          {availableLabels.map(label => (
-            <option key={label} value={label}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </section>
-
       {/* MODAL */}
       {isModalOpen && (
         <div className="modal-backdrop">
@@ -249,6 +205,9 @@ export function BugIndex() {
           </div>
         </div>
       )}
+
+      {/* BUG FILTER */}
+      <BugFilter filterBy={filterBy} onSetFilterBy={setFilterBy} availableLabels={availableLabels} />
 
       {/* BUG LIST */}
       <BugList bugs={bugs} onRemoveBug={onRemoveBug} onEditBug={onEditBug} />

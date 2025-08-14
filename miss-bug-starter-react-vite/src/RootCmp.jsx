@@ -5,7 +5,8 @@ import { Home } from './pages/Home.jsx'
 import { BugIndex } from './pages/BugIndex.jsx'
 import { BugDetails } from './pages/BugDetails.jsx'
 import { AboutUs } from './pages/AboutUs.jsx'
-import { Route, HashRouter as Router, Routes } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+//import { Route, HashRouter as Router, Routes } from 'react-router-dom'
 
 export function App() {
   return (

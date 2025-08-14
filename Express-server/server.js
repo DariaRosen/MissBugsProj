@@ -26,10 +26,11 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/bug', async (req, res) => {
-    const { title, minSeverity } = req.query
+    const { title, minSeverity, labels, pageId } = req.query
     const filterBy = {
         title: title || '',
-        minSeverity: minSeverity ? +minSeverity : 0
+        minSeverity: minSeverity ? +minSeverity : 0,
+        labels: labels ? (Array.isArray(labels) ? labels : [labels]) : []
     }
 
     if (pageId) filterBy.pageId = +pageId
@@ -56,11 +57,12 @@ app.delete('/api/bug/:id', async (req, res) => {
 
 app.post('/api/bug', async (req, res) => {
     try {
-        let { title, severity, createdAt, description } = req.body
+        let { title, severity, labels, createdAt, description } = req.body
 
         const bugToSave = {
             title,
             severity: +severity,
+            labels: labels ? (Array.isArray(labels) ? labels : [labels]) : [],
             description: description || '',
             createdAt: createdAt ? +createdAt : Date.now()
         }
@@ -78,32 +80,26 @@ app.post('/api/bug', async (req, res) => {
 
 app.put('/api/bug/:id', async (req, res) => {
     try {
-        let { _id, title, severity, createdAt, description } = req.body
+        const { title, severity, description, labels } = req.body
+        const bugId = req.params.id
+        const safeLabels = labels ? (Array.isArray(labels) ? labels : [labels]) : []
 
         const bugToSave = {
+            _id: bugId,
             title,
             severity: +severity,
-            description: description || '',
-            createdAt: createdAt ? +createdAt : Date.now()
+            description,
+            labels: safeLabels
         }
-
-        if (_id && _id.trim() !== '') {
-            // Editing existing bug
-            bugToSave._id = _id
-        } else {
-            // Creating new bug
-            bugToSave._id = makeId()
-        }
-
-        console.log('Saving bug:', bugToSave)
 
         const savedBug = await bugService.save(bugToSave)
-        res.send({ savedBug })
+        res.json(savedBug)
     } catch (err) {
-        console.error('Error saving bug:', err)
-        res.status(500).send({ err: 'Failed to save bug' })
+        console.error('Failed to update bug:', err)
+        res.status(500).send({ err: 'Failed to update bug' })
     }
 })
+
 
 app.get('/cookie', (req, res) => {
     let visitCount = req.cookies.myCookie || 0

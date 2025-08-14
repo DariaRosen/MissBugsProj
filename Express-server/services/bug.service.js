@@ -2,15 +2,9 @@
 import { loggerService } from './logger.service.js'
 import { readJsonFile } from './util.service.js'
 import { writeJsonFile } from './util.service.js'
-// import Axios from 'axios'
 
 const bugs = readJsonFile('./data/bugs.json')
 
-// var gAxios = Axios.create({
-//     withCredentials: true,
-// })
-
-// const BASE_URL = '//localhost:3030/api/bug'
 export const bugService = {
     query,
     getById,
@@ -28,6 +22,16 @@ async function query(filterBy) {
         if (filterBy.minSeverity) {
             bugsToDisplay = bugsToDisplay.filter(bug => bug.severity >= filterBy.minSeverity)
         }
+        if (filterBy.labels && filterBy.labels.length) {
+            bugsToDisplay = bugsToDisplay.filter(bug =>
+                Array.isArray(bug.labels) &&
+                filterBy.labels.every(labelFilter =>
+                    bug.labels.some(bugLabel => bugLabel.toLowerCase().includes(labelFilter.toLowerCase()))
+                )
+            )
+        }
+
+
     } catch (err) {
         loggerService.error('Error fetching bugs:', err)
         throw err

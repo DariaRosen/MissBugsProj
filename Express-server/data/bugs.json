@@ -1,19 +1,20 @@
 [
   {
+    "_id": "vawNC3",
     "title": "bbb",
     "severity": 3,
     "description": "This is a bug description",
-    "createdAt": 1542107359454,
-    "_id": "vawNC3"
+    "labels": [
+      "critical"
+    ]
   },
   {
     "_id": "111",
     "title": "aaa",
     "severity": 55,
-    "createdAt": 1642107359454,
     "description": "This is another bug description",
     "labels": [
-      "major",
+      "critical",
       "need-CR",
       "main-branch"
     ]
@@ -21,13 +22,11 @@
   {
     "_id": "555",
     "title": "hhh",
-    "severity": 55,
+    "severity": 56,
     "createdAt": 1642107359454,
     "description": "This is another bug description",
     "labels": [
-      "major",
-      "need-CR",
-      "main-branch"
+      "critical"
     ]
   },
   {
@@ -76,5 +75,24 @@
     "description": "KKK",
     "createdAt": null,
     "_id": "OdkYPl"
+  },
+  {
+    "title": "ddddd",
+    "severity": 1,
+    "labels": [
+      "critical"
+    ],
+    "description": "",
+    "createdAt": 1755156278711,
+    "_id": "0lZ44A"
+  },
+  {
+    "_id": "ExP3U8",
+    "title": "qqqqqq",
+    "severity": 3,
+    "description": "qqq",
+    "labels": [
+      "critical"
+    ]
   }
 ]

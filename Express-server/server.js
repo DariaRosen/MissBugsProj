@@ -80,20 +80,22 @@ app.post('/api/bug', async (req, res) => {
 
 app.put('/api/bug/:id', async (req, res) => {
     try {
+        const existingBug = await bugService.getById(req.params.id)
         const { title, severity, description, labels } = req.body
         const bugId = req.params.id
         const safeLabels = labels ? (Array.isArray(labels) ? labels : [labels]) : []
 
         const bugToSave = {
-            _id: bugId,
+            ...existingBug,
             title,
             severity: +severity,
             description,
-            labels: safeLabels
+            labels: safeLabels,
+            createdAt: existingBug.createdAt
         }
 
         const savedBug = await bugService.save(bugToSave)
-        res.json(savedBug)
+        res.send({ savedBug })
     } catch (err) {
         console.error('Failed to update bug:', err)
         res.status(500).send({ err: 'Failed to update bug' })

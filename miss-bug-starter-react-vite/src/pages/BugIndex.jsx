@@ -8,7 +8,6 @@ export function BugIndex() {
   const [bugs, setBugs] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [newBug, setNewBug] = useState(getEmptyBug())
-  const PAGE_SIZE = 3
 
   const availableLabels = [
     'critical',
@@ -19,15 +18,26 @@ export function BugIndex() {
     'main-branch'
   ]
 
-  const [filterBy, setFilterBy] = useState(() => {
-    const saved = localStorage.getItem('bugFilterBy')
-    return saved ? JSON.parse(saved) : { title: '', minSeverity: 0, pageIdx: undefined }
-  })
+  const [filterBy, setFilterBy] = useState(bugService.getDefaultFilter())
 
   useEffect(() => {
     localStorage.setItem('bugFilterBy', JSON.stringify(filterBy))
     loadBugs()
   }, [filterBy])
+
+  function onSetFilterBy(filterBy) {
+    setFilterBy(prevFilter => {
+      let pageIdx = undefined
+      if (prevFilter.pageIdx !== undefined) pageIdx = 0
+      return { ...prevFilter, ...filterBy, pageIdx }
+    })
+  }
+
+  function onChangePageIdx(pageIdx) {
+    // console.log('onChangePageIdx ~ pageIdx:', pageIdx)
+    if (pageIdx < 0) return
+    setFilterBy(prevFilter => ({ ...prevFilter, pageIdx }))
+  }
 
   function getEmptyBug() {
     return { title: '', severity: '', description: '', labels: [] }
@@ -37,14 +47,6 @@ export function BugIndex() {
     try {
       const bugsFromService = await bugService.query(currentFilter)
       let pagedBugs = bugsFromService
-
-      if (currentFilter.pageIdx !== undefined) {
-        const pageIdx = currentFilter.pageIdx
-        pagedBugs = bugsFromService.slice(
-          pageIdx * PAGE_SIZE,
-          (pageIdx + 1) * PAGE_SIZE
-        )
-      }
 
       setBugs(
         pagedBugs.map(bug => ({
@@ -119,37 +121,23 @@ export function BugIndex() {
     setFilterBy(prev => ({ ...prev, pageIdx: newPageIdx }))
   }
 
+  if (!bugs) return <div>Loading...</div>
+
+  const { pageIdx, ...restOfFilter } = filterBy
+  const isPaging = pageIdx !== undefined
+
   return (
     <section>
       {/* PAGINATION */}
       <div className="bug-pagination">
-        <label>
-          Use Paging:
-          <input
-            type="checkbox"
-            checked={filterBy.pageIdx !== undefined}
-            onChange={() =>
-              setFilterBy(prev =>
-                prev.pageIdx !== undefined
-                  ? { ...prev, pageIdx: undefined }
-                  : { ...prev, pageIdx: 0 }
-              )
-            }
-          />
+        <label> Use paging
+          <input type="checkbox" checked={isPaging} onChange={() => onChangePageIdx(isPaging ? undefined : 0)} />
         </label>
-
-        {filterBy.pageIdx !== undefined && (
-          <>
-            <button onClick={() => onChangePageIdx(filterBy.pageIdx - 1)} disabled={filterBy.pageIdx === 0}>-</button>
-            <span> {filterBy.pageIdx + 1} </span>
-            <button
-              onClick={() => onChangePageIdx(filterBy.pageIdx + 1)}
-              disabled={bugs.length < PAGE_SIZE}
-            >
-              +
-            </button>
-          </>
-        )}
+        {isPaging && <>
+          <button onClick={() => onChangePageIdx(pageIdx - 1)}>-</button>
+          <span>{pageIdx + 1}</span>
+          <button onClick={() => onChangePageIdx(pageIdx + 1)}>+</button>
+        </>}
       </div>
 
       <button onClick={toggleModal}>Add Bug</button>
@@ -214,3 +202,6 @@ export function BugIndex() {
     </section>
   )
 }
+
+
+

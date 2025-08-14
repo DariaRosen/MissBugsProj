@@ -12,6 +12,8 @@ export const bugService = {
     getById,
     save,
     remove,
+    getDefaultFilter,
+    getEmptyBug
 }
 
 
@@ -20,8 +22,8 @@ async function query(filterBy = {}) {
         var { data: bugs } = await axios.get(BASE_URL, { params: filterBy })
         return bugs
     } catch (err) {
-        console.error(err)
-        throw new Error('Cannot load bugs')
+        console.log('err:', err)
+        throw err
     }
 }
 async function getById(bugId) {
@@ -29,8 +31,8 @@ async function getById(bugId) {
         const res = await axios.get(BASE_URL + '/' + bugId)
         return res.data
     } catch (err) {
-        console.error(err)
-        throw new Error('Cannot load bug')
+        console.log('err:', err)
+        throw err
     }
 }
 async function remove(bugId) {
@@ -39,8 +41,8 @@ async function remove(bugId) {
         const { data: res } = await axios.delete(url)
         return res.data
     } catch (err) {
-        console.error(err)
-        throw new Error('Cannot remove bug')
+        console.log('err:', err)
+        throw err
     }
 }
 
@@ -54,7 +56,15 @@ async function save(bugToSave) {
             return data.savedBug
         }
     } catch (err) {
-        console.error(err)
-        throw new Error('Cannot save bug')
+        console.log('err:', err)
+        throw err
     }
+}
+
+function getDefaultFilter() {
+    return { txt: '', minSeverity: 0, pageIdx: undefined }
+}
+
+function getEmptyBug(title = '', severity = '', description = '', labels = []) {
+    return { title, severity, description, labels }
 }

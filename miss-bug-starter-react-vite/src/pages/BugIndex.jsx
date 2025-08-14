@@ -160,6 +160,13 @@ export function BugIndex() {
           placeholder="Min severity"
           onChange={handleFilterChange}
         />
+        <input
+          type="text"
+          name="labels"
+          value={filterBy.labels}
+          placeholder="Filter by labels"
+          onChange={handleFilterChange}
+        />
       </section>
       {/* Modal */}
       {isModalOpen && (

@@ -20,6 +20,7 @@ const corsOptions = {
 app.use(cors(corsOptions))
 app.use(coockieParser())
 app.use(express.json())
+
 app.get('/', (req, res) => {
     res.send('Hello, World!!!')
 })
@@ -30,6 +31,8 @@ app.get('/api/bug', async (req, res) => {
         title: title || '',
         minSeverity: minSeverity ? +minSeverity : 0
     }
+
+    if (pageId) filterBy.pageId = +pageId
     try {
         const bugs = await bugService.query(filterBy)
         res.send(bugs)

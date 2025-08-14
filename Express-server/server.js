@@ -4,6 +4,7 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import path from 'path'
 import { bugRoutes } from './api/bug/bug.routes.js'
+import { userRoutes } from './api/user/user.routes.js'
 
 const app = express()
 
@@ -23,6 +24,7 @@ app.use(express.static('public'))
 
 //*Routes
 app.use(bugRoutes)
+app.use(userRoutes)
 
 app.get('/cookie', (req, res) => {
     let visitCount = req.cookies.myCookie || 0

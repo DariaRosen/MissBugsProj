@@ -3,10 +3,10 @@ import { addBug, getBug, removeBug, updateBug, getBugs} from './bug.controller.j
 
 const router = express.Router()
 
-router.get('/api/bug', getBugs)
-router.get('/api/bug/:id', getBug)
-router.delete('/api/bug/:id', removeBug)
-router.post('/api/bug', addBug)
-router.put('/api/bug/:id', updateBug)
+router.get('/', getBugs)
+router.get('/:id', getBug)
+router.delete('/:id', removeBug)
+router.post('/', addBug)
+router.put('/:id', updateBug)
 
 export const bugRoutes = router

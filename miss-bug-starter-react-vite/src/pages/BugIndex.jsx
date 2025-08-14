@@ -7,7 +7,7 @@ export function BugIndex() {
   const [bugs, setBugs] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [newBug, setNewBug] = useState(getEmptyBug())
-  const [filterBy, setFilterBy] = useState({ title: '', minSeverity: 0 })
+  const PAGE_SIZE = 3
 
   const availableLabels = [
     'critical',
@@ -18,27 +18,42 @@ export function BugIndex() {
     'main-branch'
   ]
 
+  const [filterBy, setFilterBy] = useState(() => {
+    // Load filterBy from localStorage if exists, otherwise default
+    const saved = localStorage.getItem('bugFilterBy')
+    return saved ? JSON.parse(saved) : { title: '', minSeverity: 0, pageIdx: undefined }
+  })
+
+  // Save filterBy to localStorage whenever it changes
   useEffect(() => {
+    localStorage.setItem('bugFilterBy', JSON.stringify(filterBy))
     loadBugs()
   }, [filterBy])
 
-  function onSetFilterBy(filterBy) {
-    setFilterBy(prevFilter => {
-      let pageIdx = undefined
-      if (filterBy.pageIdx !== undefined) pageIdx = 0
-      return { ...prevFilter, ...filterBy, pageIdx }
-    })
-  }
+  useEffect(() => {
+    loadBugs(filterBy)
+  }, [filterBy])
 
   function getEmptyBug() {
     return { title: '', severity: '', description: '', labels: [] }
   }
 
-  async function loadBugs() {
+  async function loadBugs(currentFilter) {
     try {
-      const bugsFromService = await bugService.query(filterBy)
+      const bugsFromService = await bugService.query(currentFilter)
+      let pagedBugs = bugsFromService
+
+      // Only slice if paging is enabled
+      if (currentFilter.pageIdx !== undefined) {
+        const pageIdx = currentFilter.pageIdx
+        pagedBugs = bugsFromService.slice(
+          pageIdx * PAGE_SIZE,
+          (pageIdx + 1) * PAGE_SIZE
+        )
+      }
+
       setBugs(
-        bugsFromService.map(bug => ({
+        pagedBugs.map(bug => ({
           ...bug,
           labels: Array.isArray(bug.labels) ? bug.labels : []
         }))
@@ -47,6 +62,7 @@ export function BugIndex() {
       console.error('Failed to load bugs', err)
     }
   }
+
 
   function toggleModal() {
     setIsModalOpen(prev => !prev)
@@ -64,7 +80,7 @@ export function BugIndex() {
 
   function handleFilterChange({ target }) {
     const { name, value } = target
-    setFilterBy(prev => ({ ...prev, [name]: value }))
+    setFilterBy(prev => ({ ...prev, [name]: value, pageIdx: 0 }))
   }
 
   async function onRemoveBug(bugId) {
@@ -112,39 +128,47 @@ export function BugIndex() {
     }
   }
 
-  async function onChangePageIdx(pageIdx) {
-    if (pageIdx < 0) return
-    setFilterBy(prevFilter => ({ ...prevFilter, pageIdx }))
-
-    if (!bugs) return <div>Loading...</div>
-
-    const { pageIdx: currentPageIdx, ...filterBy } = filterBy
-    const isPaging = currentPageIdx !== undefined
-    return (
-      <section className="bug-index">
-        <div className="bug-pagination">
-          <label>Use Paging:
-            <input type="checkbox" checked={isPaging} onChange={() => onChangePageId(isPaging ? undefined : 0)} />
-          </label>
-          {isPaging && <>
-            <button onClick={() => onChangePageIdx(pageIdx - 1)} >-</button>
-            <span> {pageIdx + 1}</span>
-            <button onClick={() => onChangePageIdx(pageIdx + 1)} >+</button>
-          </>}
-        </div>
-        <BugFilter filterBy={restOfFilter} onSetFilterBy={onSetFilterBy} />
-        <Link to="bug/edit" className="edit-bug-link">Add Bug</Link>
-        <BugList bugs={bugs} onRemoveBug={onRemoveBug} onEditBug={onEditBug} />
-      </section>
-    )
+  function onChangePageIdx(newPageIdx) {
+    if (newPageIdx < 0) return
+    setFilterBy(prev => ({ ...prev, pageIdx: newPageIdx }))
   }
 
   return (
     <section>
+      {/* PAGINATION */}
+      <div className="bug-pagination">
+        <label>
+          Use Paging:
+          <input
+            type="checkbox"
+            checked={filterBy.pageIdx !== undefined}
+            onChange={() =>
+              setFilterBy(prev =>
+                prev.pageIdx !== undefined
+                  ? { ...prev, pageIdx: undefined }
+                  : { ...prev, pageIdx: 0 }
+              )
+            }
+          />
+        </label>
+
+        {filterBy.pageIdx !== undefined && (
+          <>
+            <button onClick={() => onChangePageIdx(filterBy.pageIdx - 1)} disabled={filterBy.pageIdx === 0}>-</button>
+            <span> {filterBy.pageIdx + 1} </span>
+            <button
+              onClick={() => onChangePageIdx(filterBy.pageIdx + 1)}
+              disabled={bugs.length < PAGE_SIZE}
+            >
+              +
+            </button>
+          </>
+        )}
+      </div>
 
       <button onClick={toggleModal}>Add Bug</button>
 
-      {/* Filter Controls */}
+      {/* FILTERS */}
       <section className="filters">
         <input
           type="text"
@@ -173,7 +197,8 @@ export function BugIndex() {
           ))}
         </select>
       </section>
-      {/* Modal */}
+
+      {/* MODAL */}
       {isModalOpen && (
         <div className="modal-backdrop">
           <div className="modal">
@@ -225,9 +250,8 @@ export function BugIndex() {
         </div>
       )}
 
-      {/* Bug List */}
+      {/* BUG LIST */}
       <BugList bugs={bugs} onRemoveBug={onRemoveBug} onEditBug={onEditBug} />
     </section>
   )
 }
-

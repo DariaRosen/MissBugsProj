@@ -160,13 +160,18 @@ export function BugIndex() {
           placeholder="Min severity"
           onChange={handleFilterChange}
         />
-        <input
-          type="text"
+        <select
           name="labels"
-          value={filterBy.labels}
-          placeholder="Filter by labels"
+          value={filterBy.labels || ''}
           onChange={handleFilterChange}
-        />
+        >
+          <option value="">All Labels</option>
+          {availableLabels.map(label => (
+            <option key={label} value={label}>
+              {label}
+            </option>
+          ))}
+        </select>
       </section>
       {/* Modal */}
       {isModalOpen && (

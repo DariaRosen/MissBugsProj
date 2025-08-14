@@ -3,6 +3,7 @@
     "_id": "vawNC3",
     "title": "bbb",
     "severity": 3,
+    "createdAt": 1754991467975,
     "description": "This is a bug description",
     "labels": [
       "critical"
@@ -12,6 +13,7 @@
     "_id": "111",
     "title": "aaa",
     "severity": 55,
+    "createdAt": 1754991467975,
     "description": "This is another bug description",
     "labels": [
       "critical",
@@ -59,21 +61,21 @@
     "title": "qqq",
     "severity": 1,
     "description": "qqq",
-    "createdAt": null,
+    "createdAt": 1754991467975,
     "_id": "5peeqa"
   },
   {
     "title": "JJJ",
     "severity": 1,
     "description": "JJJJJ",
-    "createdAt": null,
+    "createdAt": 1754991467975,
     "_id": "KWBpH7"
   },
   {
     "title": "KKK",
     "severity": 100,
     "description": "KKK",
-    "createdAt": null,
+    "createdAt": 1754991467975,
     "_id": "OdkYPl"
   },
   {
@@ -90,9 +92,30 @@
     "_id": "ExP3U8",
     "title": "qqqqqq",
     "severity": 3,
+    "createdAt": 1755160166032,
     "description": "qqq",
     "labels": [
       "critical"
     ]
+  },
+  {
+    "title": "ghgh",
+    "severity": 2,
+    "labels": [
+      "critical"
+    ],
+    "description": "ghgh",
+    "createdAt": 1755160166032,
+    "_id": "1ZyHx1"
+  },
+  {
+    "title": "dfgfg",
+    "severity": 1,
+    "labels": [
+      "critical"
+    ],
+    "description": "ffffffgf",
+    "createdAt": 1755163590955,
+    "_id": "F9x4K0"
   }
 ]

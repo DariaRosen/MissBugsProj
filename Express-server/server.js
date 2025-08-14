@@ -4,6 +4,7 @@ import { bugService } from './services/bug.service.js'
 import { loggerService } from './services/logger.service.js'
 import cors from 'cors'
 import coockieParser from 'cookie-parser'
+import path from 'path'
 
 const app = express()
 app.use(express.static('public'))
@@ -150,6 +151,15 @@ app.get('/api/bug/:id', async (req, res) => {
     }
 })
 
+//* For SPA (Single Page Application) support - catch-all routes and sent to index.html
+app.get(/^\/(?!api).*/, (req, res) => {
+    res.sendFile(path.resolve('public/index.html'), (err) => {
+        if (err) {
+            loggerService.error('Error sending index.html:', err)
+            res.status(500).send({ error: 'Failed to load application' })
+        }
+    })
+})
 
 const PORT = 3030
 app.listen(PORT, () => loggerService.info(`Server is running on http://localhost:${PORT}`))

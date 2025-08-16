@@ -1,21 +1,22 @@
 import { bugService } from './bug.service.js'
 import { loggerService } from '../../services/logger.service.js'
-import { makeId } from '../../services/util.service.js'
 
 export async function getBugs(req, res) {
-    const { title, minSeverity, labels, pageIdx } = req.query
+    const { title, minSeverity, labels, pageIdx, sortBy, sortDir } = req.query
     const filterBy = {
         title: title || '',
         minSeverity: minSeverity ? +minSeverity : 0,
-        labels: labels ? (Array.isArray(labels) ? labels : [labels]) : []
+        labels: labels ? (Array.isArray(labels) ? labels : [labels]) : [],
+        sortBy: sortBy || '',          // ✅ parse sorting field
+        sortDir: sortDir || 'asc'      // ✅ parse sorting direction
     }
 
-    if (pageIdx) filterBy.pageIdx = +pageIdx
+    if (pageIdx !== undefined) filterBy.pageIdx = +pageIdx
+
     try {
         const bugs = await bugService.query(filterBy)
         res.send(bugs)
-    }
-    catch (err) {
+    } catch (err) {
         loggerService.error('Cannot get bugs:', err)
         res.status(500).send({ error: 'Failed to get bugs' })
     }
@@ -84,7 +85,6 @@ export async function updateBug(req, res) {
     try {
         const existingBug = await bugService.getById(req.params.id)
         const { title, severity, description, labels } = req.body
-        const bugId = req.params.id
         const safeLabels = labels ? (Array.isArray(labels) ? labels : [labels]) : []
 
         const bugToSave = {

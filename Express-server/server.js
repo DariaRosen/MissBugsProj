@@ -17,14 +17,17 @@ const corsOptions = {
     ],
     credentials: true,
 }
+
+//*Express configuration
 app.use(cors(corsOptions))
 app.use(cookieParser())
 app.use(express.json())
 app.use(express.static('public'))
+app.set('query parser', 'extended')
 
 //*Routes
-app.use(bugRoutes)
-app.use(userRoutes)
+app.use('/api/bug/', bugRoutes)
+app.use('/api/user/', userRoutes)
 
 app.get('/cookie', (req, res) => {
     let visitCount = req.cookies.myCookie || 0
@@ -35,7 +38,7 @@ app.get('/cookie', (req, res) => {
 })
 
 //* For SPA (Single Page Application) support - catch-all routes and sent to index.html
-app.get(/^\/(?!api).*/, (req, res) => {
+app.get('/*all', (req, res) => {
     res.sendFile(path.resolve('public/index.html'), (err) => {
         if (err) {
             loggerService.error('Error sending index.html:', err)

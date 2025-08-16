@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react"
-import { debounce } from "../services/util.service.js"
 import { utilService } from "../services/util.service.js"
 
 export function BugFilter({ filterBy, onSetFilterBy, availableLabels }) {

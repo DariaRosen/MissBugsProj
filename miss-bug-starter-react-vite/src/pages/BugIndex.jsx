@@ -3,6 +3,7 @@ import { bugService } from '../services/bug'
 import { showSuccessMsg, showErrorMsg } from '../services/event-bus.service.js'
 import { BugList } from '../cmps/BugList.jsx'
 import { BugFilter } from '../cmps/BugFilter.jsx'
+import { BugSorting } from '../cmps/BugSorting.jsx'
 
 export function BugIndex() {
   const [bugs, setBugs] = useState([])
@@ -19,24 +20,24 @@ export function BugIndex() {
   ]
 
   const [filterBy, setFilterBy] = useState(bugService.getDefaultFilter())
+  const [sortBy, setSortBy] = useState({}) 
 
   useEffect(() => {
     localStorage.setItem('bugFilterBy', JSON.stringify(filterBy))
     loadBugs()
-  }, [filterBy])
+  }, [filterBy, sortBy]) 
 
-  function onSetFilterBy(filterBy) {
+  function onSetFilterBy(nextPartial) {
     setFilterBy(prevFilter => {
       let pageIdx = undefined
       if (prevFilter.pageIdx !== undefined) pageIdx = 0
-      return { ...prevFilter, ...filterBy, pageIdx }
+      return { ...prevFilter, ...nextPartial, pageIdx }
     })
   }
 
-  function onChangePageIdx(pageIdx) {
-    // console.log('onChangePageIdx ~ pageIdx:', pageIdx)
-    if (pageIdx < 0) return
-    setFilterBy(prevFilter => ({ ...prevFilter, pageIdx }))
+  function onChangePageIdx(newPageIdx) {
+    if (newPageIdx < 0) return
+    setFilterBy(prevFilter => ({ ...prevFilter, pageIdx: newPageIdx }))
   }
 
   function getEmptyBug() {
@@ -45,7 +46,8 @@ export function BugIndex() {
 
   async function loadBugs(currentFilter = filterBy) {
     try {
-      const bugsFromService = await bugService.query(currentFilter)
+      // merge filters + sort into one query object
+      const bugsFromService = await bugService.query({ ...currentFilter, ...sortBy })
       let pagedBugs = bugsFromService
 
       setBugs(
@@ -116,22 +118,25 @@ export function BugIndex() {
     }
   }
 
-  function onChangePageIdx(newPageIdx) {
-    if (newPageIdx < 0) return
-    setFilterBy(prev => ({ ...prev, pageIdx: newPageIdx }))
-  }
-
   if (!bugs) return <div>Loading...</div>
 
   const { pageIdx, ...restOfFilter } = filterBy
   const isPaging = pageIdx !== undefined
+
+  function onSetSortBy(nextSort) {
+    setSortBy(nextSort)
+  }
 
   return (
     <section>
       {/* PAGINATION */}
       <div className="bug-pagination">
         <label> Use paging
-          <input type="checkbox" checked={isPaging} onChange={() => onChangePageIdx(isPaging ? undefined : 0)} />
+          <input
+            type="checkbox"
+            checked={isPaging}
+            onChange={() => onChangePageIdx(isPaging ? undefined : 0)}
+          />
         </label>
         {isPaging && <>
           <button onClick={() => onChangePageIdx(pageIdx - 1)}>-</button>
@@ -195,13 +200,17 @@ export function BugIndex() {
       )}
 
       {/* BUG FILTER */}
-      <BugFilter filterBy={filterBy} onSetFilterBy={setFilterBy} availableLabels={availableLabels} />
+      <BugFilter
+        filterBy={filterBy}
+        onSetFilterBy={onSetFilterBy}
+        availableLabels={availableLabels}
+      />
+
+      {/* BUG SORTING */}
+      <BugSorting onSetSortBy={onSetSortBy} currentSort={sortBy} />
 
       {/* BUG LIST */}
       <BugList bugs={bugs} onRemoveBug={onRemoveBug} onEditBug={onEditBug} />
     </section>
   )
 }
-
-
-

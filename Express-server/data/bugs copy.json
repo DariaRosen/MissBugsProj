@@ -1,0 +1,92 @@
+[
+    {
+        "_id": "vawNC3",
+        "title": "bbb",
+        "severity": 5,
+        "createdAt": 1754991467975,
+        "description": "This is a bug description",
+        "labels": [
+            "critical"
+        ]
+    },
+    {
+        "_id": "111",
+        "title": "aaa",
+        "severity": 55,
+        "createdAt": 1754991467975,
+        "description": "This is another bug description",
+        "labels": [
+            "critical",
+            "need-CR",
+            "main-branch"
+        ]
+    },
+    {
+        "_id": "555",
+        "title": "hhh",
+        "severity": 56,
+        "createdAt": 1642107359454,
+        "description": "This is another bug description",
+        "labels": [
+            "critical"
+        ]
+    },
+    {
+        "_id": "333",
+        "title": "ccc",
+        "severity": 2,
+        "createdAt": 1542107359454,
+        "description": "This is a bug description",
+        "labels": [
+            "minor",
+            "need-CR",
+            "dev-branch"
+        ]
+    },
+    {
+        "title": "jjj",
+        "severity": 6,
+        "description": "jjjjj",
+        "createdAt": 1754991116828,
+        "_id": "nKSwnv"
+    },
+    {
+        "title": "kkk",
+        "severity": 8,
+        "description": "kkkkk",
+        "createdAt": 1754991467975,
+        "_id": "LHLUOT"
+    },
+    {
+        "title": "qqq",
+        "severity": 1,
+        "description": "qqq",
+        "createdAt": 1754991467975,
+        "_id": "5peeqa"
+    },
+    {
+        "title": "JJJ",
+        "severity": 1,
+        "description": "JJJJJ",
+        "createdAt": 1754991467975,
+        "_id": "KWBpH7"
+    },
+    {
+        "title": "KKK",
+        "severity": 100,
+        "description": "KKK",
+        "createdAt": 1754991467975,
+        "_id": "OdkYPl"
+    },
+    {
+        "title": "ddddd",
+        "severity": 2,
+        "labels": [
+            "critical",
+            "need-CR"
+        ],
+        "description": "aaa",
+        "createdAt": 1755156278711,
+        "_id": "0lZ44A"
+    }
+]

@@ -2,8 +2,8 @@
     {
         "_id": "u101",
         "username": "puki",
-        "fullname": "Puki Ja",
-        "password": "secret1",
+        "fullname": "Puki Jaa",
+        "password": "123",
         "score": 95,
         "isAdmin": true
     },
@@ -19,6 +19,15 @@
         "username": "tsuki",
         "fullname": "Tsuki Ca",
         "password   ": "secret3",
-        "score": 100
+        "score": 100,
+        "password": "111"
+    },
+    {
+        "fullname": "AAAaaa",
+        "username": "BBBaaa",
+        "password": "sfdhukolo;p;",
+        "score": "6",
+        "_id": "ydKP8M",
+        "isAdmin": false
     }
 ]

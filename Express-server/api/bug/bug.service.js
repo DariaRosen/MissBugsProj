@@ -77,6 +77,7 @@ async function save(bugToSave) {
     try {
         if (bugToSave._id) {
             const idx = bugs.findIndex(bug => bug._id === bugToSave._id)
+            console.log('idx:', idx);
             if (idx === -1) throw `Couldn't update bug with _id ${bugToSave._id}`
             bugs[idx] = bugToSave
         } else {

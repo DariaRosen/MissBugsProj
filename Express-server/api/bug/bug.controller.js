@@ -1,5 +1,6 @@
 import { bugService } from './bug.service.js'
 import { loggerService } from '../../services/logger.service.js'
+import { makeId } from '../../services/util.service.js'
 
 export async function getBugs(req, res) {
     const { title, minSeverity, labels, pageIdx } = req.query
@@ -70,9 +71,6 @@ export async function addBug(req, res) {
             description: description || '',
             createdAt: createdAt ? +createdAt : Date.now()
         }
-        bugToSave._id = makeId()
-
-        console.log('New bug:', bugToSave)
 
         const savedBug = await bugService.save(bugToSave)
         res.send({ savedBug })

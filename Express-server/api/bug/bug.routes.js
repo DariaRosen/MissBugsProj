@@ -1,5 +1,5 @@
 import express from 'express'
-import { addBug, getBug, removeBug, updateBug, getBugs} from './bug.controller.js'
+import { addBug, getBug, removeBug, updateBug, getBugs } from './bug.controller.js'
 
 const router = express.Router()
 

@@ -22,25 +22,42 @@ async function query(filterBy) {
 
         // Filter by severity
         if (filterBy.minSeverity) {
-            bugsToDisplay = bugsToDisplay.filter(bug => bug.severity >= filterBy.minSeverity)
+            bugsToDisplay = bugsToDisplay.filter(bug => bug.severity >= +filterBy.minSeverity)
         }
 
         // Filter by labels
         if (filterBy.labels && filterBy.labels.length) {
             const labelsArray = Array.isArray(filterBy.labels)
                 ? filterBy.labels
-                : [filterBy.labels] // in case query param is string
+                : [filterBy.labels]
             bugsToDisplay = bugsToDisplay.filter(bug =>
                 Array.isArray(bug.labels) &&
                 labelsArray.every(labelFilter =>
-                    bug.labels.some(bugLabel => bugLabel.toLowerCase().includes(labelFilter.toLowerCase()))
+                    bug.labels.some(bugLabel =>
+                        bugLabel.toLowerCase().includes(labelFilter.toLowerCase())
+                    )
                 )
             )
         }
 
+        // ✅ Sorting
+        if (filterBy.sortBy) {
+            const sortDir = filterBy.sortDir === 'desc' ? -1 : 1
+            bugsToDisplay = bugsToDisplay.sort((a, b) => {
+                if (filterBy.sortBy === 'title') {
+                    return a.title.localeCompare(b.title) * sortDir
+                } else if (filterBy.sortBy === 'severity') {
+                    return (a.severity - b.severity) * sortDir
+                } else if (filterBy.sortBy === 'createdAt') {
+                    return (new Date(a.createdAt) - new Date(b.createdAt)) * sortDir
+                }
+                return 0
+            })
+        }
+
         // Paging
         if ('pageIdx' in filterBy) {
-            const startIdx = filterBy.pageIdx * PAGE_SIZE // 0
+            const startIdx = filterBy.pageIdx * PAGE_SIZE
             bugsToDisplay = bugsToDisplay.slice(startIdx, startIdx + PAGE_SIZE)
         }
 
@@ -56,7 +73,6 @@ function getById(bugId) {
         const bug = bugs.find(b => b._id === bugId)
         if (!bug) throw `Couldn't find bug with _id ${bugId}`
         return bug
-
     } catch (err) {
         throw err
     }
@@ -77,7 +93,6 @@ async function save(bugToSave) {
     try {
         if (bugToSave._id) {
             const idx = bugs.findIndex(bug => bug._id === bugToSave._id)
-            console.log('idx:', idx);
             if (idx === -1) throw `Couldn't update bug with _id ${bugToSave._id}`
             bugs[idx] = bugToSave
         } else {
@@ -100,4 +115,3 @@ function _saveBugsToFile(path = './data/bugs.json') {
         })
     })
 }
-

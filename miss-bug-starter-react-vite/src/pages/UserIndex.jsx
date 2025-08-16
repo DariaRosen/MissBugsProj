@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { userService } from '../services/user.service.js'
+import { userService } from '../services/user'
 import { showErrorMsg, showSuccessMsg } from '../services/event-bus.service.js'
 
 export function UserIndex() {

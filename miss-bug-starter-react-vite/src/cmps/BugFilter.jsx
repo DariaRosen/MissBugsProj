@@ -26,6 +26,9 @@ export function BugFilter({ filterBy, onSetFilterBy, availableLabels }) {
 
     const { title, minSeverity, labels } = filterByToEdit
 
+    console.log("filterByToEdit:", filterByToEdit);
+    console.log("onSetFilterByDebounce:", onSetFilterByDebounce);
+
     return (
         <section className="bug-filter">
             <h2>Filter Bugs</h2>
@@ -56,7 +59,34 @@ export function BugFilter({ filterBy, onSetFilterBy, availableLabels }) {
                         </option>
                     ))}
                 </select>
+
+                {/* --- SORTING CONTROLS --- */}
+                <label>
+                    Sort by:
+                    <select
+                        name="sortBy"
+                        value={filterByToEdit.sortBy}
+                        onChange={handleChange}
+                    >
+                        <option value="title">Title</option>
+                        <option value="severity">Severity</option>
+                        <option value="createdAt">Created At</option>
+                    </select>
+                </label>
+
+                <button
+                    type="button"
+                    onClick={() =>
+                        setFilterByToEdit(prev => ({
+                            ...prev,
+                            sortDir: prev.sortDir === 'asc' ? 'desc' : 'asc'
+                        }))
+                    }
+                >
+                    {filterByToEdit.sortDir === 'asc' ? 'Asc' : 'Desc'}
+                </button>
             </form>
         </section>
     )
+
 }

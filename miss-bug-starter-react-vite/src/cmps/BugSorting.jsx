@@ -1,19 +1,21 @@
-import { useState } from 'react'
+// BugSorting.jsx
+import { useState, useEffect } from 'react'
 
-export function BugSorting({ onSetSortBy }) {
-    const [sortBy, setSortBy] = useState('title')
-    const [sortDir, setSortDir] = useState(1) // 1 = asc, -1 = desc
+export function BugSorting({ onSetSortBy, currentSort }) {
+    const [sortBy, setSortBy] = useState(currentSort?.sortBy || 'title')
+    const [sortDir, setSortDir] = useState(currentSort?.sortDir || 'asc') // 'asc' | 'desc'
+
+    // keep parent in sync whenever local sort changes
+    useEffect(() => {
+        onSetSortBy({ sortBy, sortDir })
+    }, [sortBy, sortDir])
 
     function handleSortByChange({ target }) {
-        const newSortBy = target.value
-        setSortBy(newSortBy)
-        onSetSortBy({ sortBy: newSortBy, sortDir })
+        setSortBy(target.value)
     }
 
     function toggleSortDir() {
-        const newSortDir = sortDir === 1 ? -1 : 1
-        setSortDir(newSortDir)
-        onSetSortBy({ sortBy, sortDir: newSortDir })
+        setSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'))
     }
 
     return (
@@ -27,8 +29,8 @@ export function BugSorting({ onSetSortBy }) {
                 </select>
             </label>
 
-            <button onClick={toggleSortDir}>
-                {sortDir === 1 ? 'Asc' : 'Desc'}
+            <button type="button" onClick={toggleSortDir}>
+                {sortDir === 'asc' ? 'Asc' : 'Desc'}
             </button>
         </div>
     )

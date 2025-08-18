@@ -1,6 +1,5 @@
 // BugPreview.jsx
 export function BugPreview({ bug }) {
-    console.log('BugPreview render — bug severity:', bug.severity)
     return (
         <article>
             <h4>{bug.title}</h4>

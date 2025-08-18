@@ -1,4 +1,3 @@
-
 import Axios from 'axios'
 
 var axios = Axios.create({
@@ -19,13 +18,23 @@ export const bugService = {
 
 async function query(filterBy = {}) {
     try {
-        var { data: bugs } = await axios.get(BASE_URL, { params: filterBy })
+        // Support sorting in backend
+        const params = {
+            txt: filterBy.txt || '',
+            minSeverity: filterBy.minSeverity || 0,
+            pageIdx: filterBy.pageIdx,
+            sortBy: filterBy.sortBy,   // ✅ add sorting field
+            sortDir: filterBy.sortDir  // ✅ add sorting direction
+        }
+
+        var { data: bugs } = await axios.get(BASE_URL, { params })
         return bugs
     } catch (err) {
         console.log('err:', err)
         throw err
     }
 }
+
 async function getById(bugId) {
     try {
         const res = await axios.get(BASE_URL + '/' + bugId)
@@ -35,6 +44,7 @@ async function getById(bugId) {
         throw err
     }
 }
+
 async function remove(bugId) {
     const url = BASE_URL + '/' + bugId
     try {
@@ -62,7 +72,13 @@ async function save(bugToSave) {
 }
 
 function getDefaultFilter() {
-    return { txt: '', minSeverity: 0, pageIdx: undefined }
+    return {
+        txt: '',
+        minSeverity: 0,
+        pageIdx: undefined,
+        sortBy: 'title',   // ✅ default sort field
+        sortDir: 'asc'     // ✅ default direction
+    }
 }
 
 function getEmptyBug(title = '', severity = '', description = '', labels = []) {

@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser'
 import path from 'path'
 import { bugRoutes } from './api/bug/bug.routes.js'
 import { userRoutes } from './api/user/user.routes.js'
+import { authRoutes } from './api/auth/auth.routes.js'
 
 const app = express()
 
@@ -28,6 +29,7 @@ app.set('query parser', 'extended')
 //*Routes
 app.use('/api/bug/', bugRoutes)
 app.use('/api/user/', userRoutes)
+app.use('/api/auth/', authRoutes)
 
 app.get('/cookie', (req, res) => {
     let visitCount = req.cookies.myCookie || 0

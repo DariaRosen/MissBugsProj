@@ -24,6 +24,7 @@ export const userService = {
     getById,
     remove,
     update,
+    save,
     getEmptyUser,
 }
 
@@ -58,11 +59,11 @@ async function getById(userId) {
 }
 
 async function remove(userId) {
-    return await axios.remove(BASE_USER_URL + userId)
+    return await axios.delete(BASE_USER_URL + userId)
 }
 
 async function update(userToUpdate) {
-    const updatedUser = await axios.put(BASE_USER_URL, userToUpdate)
+    const { data: updatedUser } = await axios.put(BASE_USER_URL + userToUpdate._id, userToUpdate)
     if (getLoggedinUser().id === updatedUser.id) saveLocalUser(updatedUser)
     return updatedUser
 }
@@ -72,7 +73,9 @@ function getEmptyUser() {
         username: '',
         fullname: '',
         password: '',
-        imgUrl: '',
+        score: 0,
+        isAdmin: false,
+        imgUrl: ''
     }
 }
 
@@ -86,3 +89,15 @@ function getLoggedinUser() {
     return JSON.parse(sessionStorage.getItem(STORAGE_KEY_LOGGEDIN_USER))
 }
 
+async function save(user) {
+    if (user._id) {
+        // update existing
+        const { data: updatedUser } = await axios.put(BASE_USER_URL + user._id, user)
+        if (getLoggedinUser()?._id === updatedUser._id) saveLocalUser(updatedUser)
+        return updatedUser
+    } else {
+        // create new
+        const { data: newUser } = await axios.post(BASE_USER_URL, user)
+        return newUser
+    }
+}

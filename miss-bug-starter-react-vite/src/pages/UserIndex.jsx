@@ -17,7 +17,7 @@ export function UserIndex() {
 
     async function loadUsers() {
         try {
-            const usersFromService = await userService.query()
+            const usersFromService = await userService.getUsers()
             setUsers(usersFromService)
         } catch (err) {
             console.error('Failed loading users', err)
@@ -30,8 +30,8 @@ export function UserIndex() {
     }
 
     function handleChange({ target }) {
-        const { name, value } = target
-        setNewUser(prev => ({ ...prev, [name]: value }))
+        const { name, value, type, checked } = target
+        setNewUser(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
     }
 
     async function onRemoveUser(userId) {
@@ -59,6 +59,8 @@ export function UserIndex() {
         ev.preventDefault()
         try {
             const savedUser = await userService.save(newUser)
+            if (!savedUser._id) throw new Error('Saved user missing _id')
+
             setUsers(prev => {
                 const idx = prev.findIndex(u => u._id === savedUser._id)
                 if (idx > -1) {
@@ -68,6 +70,7 @@ export function UserIndex() {
                 }
                 return [...prev, savedUser]
             })
+
             showSuccessMsg('User saved successfully!')
             setNewUser(getEmptyUser())
             toggleModal()
@@ -76,6 +79,7 @@ export function UserIndex() {
             showErrorMsg('Cannot save user')
         }
     }
+
 
     return (
         <section className="user-index">
@@ -125,7 +129,7 @@ export function UserIndex() {
                                     type="checkbox"
                                     name="isAdmin"
                                     checked={newUser.isAdmin}
-                                    onChange={() => setNewUser(prev => ({ ...prev, isAdmin: !prev.isAdmin }))}
+                                    onChange={handleChange}
                                 />
                                 Is Admin
                             </label>

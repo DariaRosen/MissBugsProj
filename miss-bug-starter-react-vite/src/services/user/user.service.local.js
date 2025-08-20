@@ -1,36 +1,86 @@
+import { storageService } from "../async-storage.service.js"
 
-import { storageService } from '../async-storage.service.js'
-import { utilService } from '../util.service.js'
-import Axios from 'axios'
-
-var axios = Axios.create({
-    withCredentials: true,
-})
-
-const BASE_URL = '//localhost:3030/api/user'
+const STORAGE_KEY_LOGGEDIN_USER = 'loggedinUser'
+const STORAGE_KEY_USER_DB = 'userDB'
 
 export const userService = {
-    query,
+    login,
+    logout,
+    signup,
+    getLoggedinUser,
+    saveLocalUser,
+
+    getUsers,
     getById,
-    save,
     remove,
+    update,
+    getEmptyUser
 }
 
+window.userService = userService
 
-function query() {
-    var users = axios.get(BASE_URL)
-    return storageService.query(STORAGE_KEY)
+function getUsers() {
+    return storageService.query(STORAGE_KEY_USER_DB)
 }
-function getById(userId) {
-    return storageService.get(STORAGE_KEY, userId)
+
+async function getById(userId) {
+    const user = await storageService.get(STORAGE_KEY_USER_DB, userId)
+    return user
 }
+
 function remove(userId) {
-    return storageService.remove(STORAGE_KEY, userId)
+    return storageService.remove(STORAGE_KEY_USER_DB, userId)
 }
-function save(user) {
-    if (user._id) {
-        return storageService.put(STORAGE_KEY, user)
-    } else {
-        return storageService.post(STORAGE_KEY, user)
+
+async function update(userToUpdate) {
+    const user = await getById(userToUpdate.id)
+
+    const updatedUser = await storageService.put(STORAGE_KEY_USER_DB, { ...user, ...userToUpdate })
+    if (getLoggedinUser().id === updatedUser.id) saveLocalUser(updatedUser)
+    return updatedUser
+}
+
+function getEmptyUser() {
+    return {
+        username: '',
+        fullname: '',
+        password: '',
+        imgUrl: '',
     }
 }
+
+async function login(userCred) {
+    const users = await storageService.query(STORAGE_KEY_USER_DB)
+    const user = users.find(user => user.username === userCred.username)
+    if (user) {
+        return saveLocalUser(user)
+    }
+}
+
+async function signup(userCred) {
+    userCred.score = 10000
+    if (!userCred.imgUrl) userCred.imgUrl = 'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png'
+    const user = await storageService.post(STORAGE_KEY_USER_DB, userCred)
+    return saveLocalUser(user)
+}
+
+async function logout() {
+    sessionStorage.removeItem(STORAGE_KEY_LOGGEDIN_USER)
+}
+
+function saveLocalUser(user) {
+    user = { _id: user._id, fullname: user.fullname, imgUrl: user.imgUrl, score: user.score }
+    sessionStorage.setItem(STORAGE_KEY_LOGGEDIN_USER, JSON.stringify(user))
+    return user
+}
+
+function getLoggedinUser() {
+    return JSON.parse(sessionStorage.getItem(STORAGE_KEY_LOGGEDIN_USER))
+}
+
+
+// ;(async ()=>{
+//     await userService.signup({fullname: 'Puki Norma', username: 'puki', password:'123', isAdmin: false})
+//     await userService.signup({fullname: 'Master Adminov', username: 'admin', password:'123',  isAdmin: true})
+//     await userService.signup({fullname: 'Muki G', username: 'muki', password:'123'})
+// })()

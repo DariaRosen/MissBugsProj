@@ -7,7 +7,8 @@
         "description": "This is a bug description",
         "labels": [
             "critical"
-        ]
+        ],
+        "creator": { "_id": "u101", "fullname": "Puki Ja" }
     },
     {
         "_id": "111",
@@ -19,7 +20,8 @@
             "critical",
             "need-CR",
             "main-branch"
-        ]
+        ],
+        "creator": { "_id": "u101", "fullname": "Puki Ja" }
     },
     {
         "_id": "555",
@@ -29,7 +31,8 @@
         "description": "This is another bug description",
         "labels": [
             "critical"
-        ]
+        ],
+        "creator": { "_id": "u101", "fullname": "Puki Ja" }
     },
     {
         "_id": "333",
@@ -41,42 +44,48 @@
             "minor",
             "need-CR",
             "dev-branch"
-        ]
+        ],
+        "creator": { "_id": "u101", "fullname": "Puki Ja" }
     },
     {
         "title": "jjj",
         "severity": 6,
         "description": "jjjjj",
         "createdAt": 1754991116828,
-        "_id": "nKSwnv"
+        "_id": "nKSwnv",
+        "creator": { "_id": "u101", "fullname": "Puki Ja" }
     },
     {
         "title": "kkk",
         "severity": 8,
         "description": "kkkkk",
         "createdAt": 1754991467975,
-        "_id": "LHLUOT"
+        "_id": "LHLUOT",
+        "creator": { "_id": "u101", "fullname": "Puki Ja" }
     },
     {
         "title": "qqq",
         "severity": 1,
         "description": "qqq",
         "createdAt": 1754991467975,
-        "_id": "5peeqa"
+        "_id": "5peeqa",
+        "creator": { "_id": "u101", "fullname": "Puki Ja" }
     },
     {
         "title": "JJJ",
         "severity": 1,
         "description": "JJJJJ",
         "createdAt": 1754991467975,
-        "_id": "KWBpH7"
+        "_id": "KWBpH7",
+        "creator": { "_id": "u101", "fullname": "Puki Ja" }
     },
     {
         "title": "KKK",
         "severity": 100,
         "description": "KKK",
         "createdAt": 1754991467975,
-        "_id": "OdkYPl"
+        "_id": "OdkYPl",
+        "creator": { "_id": "u101", "fullname": "Puki Ja" }
     },
     {
         "title": "ddddd",
@@ -86,7 +95,8 @@
         ],
         "description": "",
         "createdAt": 1755156278711,
-        "_id": "0lZ44A"
+        "_id": "0lZ44A",
+        "creator": { "_id": "u101", "fullname": "Puki Ja" }
     },
     {
         "_id": "ExP3U8",
@@ -96,6 +106,7 @@
         "description": "qqq",
         "labels": [
             "critical"
-        ]
+        ],
+        "creator": { "_id": "u101", "fullname": "Puki Ja" }
     }
 ]

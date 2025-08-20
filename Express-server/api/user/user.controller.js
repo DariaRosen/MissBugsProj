@@ -73,7 +73,7 @@ export async function addUser(req, res) {
         }
 
         const savedUser = await userService.save(userToSave)
-        res.send({ savedUser })
+        res.send( savedUser )
     } catch (err) {
         console.error('Error saving user:', err)
         res.status(500).send({ err: 'Failed to save user' })
@@ -95,7 +95,7 @@ export async function updateUser(req, res) {
         }
 
         const savedUser = await userService.save(userToSave)
-        res.send({ savedUser })
+        res.send( savedUser )
     } catch (err) {
         console.error('Failed to update user:', err)
         res.status(500).send({ err: 'Failed to update user' })

@@ -13,7 +13,6 @@ export const userService = {
     getUsers,
     getById,
     remove,
-    update,
     getEmptyUser
 }
 
@@ -30,14 +29,6 @@ async function getById(userId) {
 
 function remove(userId) {
     return storageService.remove(STORAGE_KEY_USER_DB, userId)
-}
-
-async function update(userToUpdate) {
-    const user = await getById(userToUpdate.id)
-
-    const updatedUser = await storageService.put(STORAGE_KEY_USER_DB, { ...user, ...userToUpdate })
-    if (getLoggedinUser().id === updatedUser.id) saveLocalUser(updatedUser)
-    return updatedUser
 }
 
 function getEmptyUser() {

@@ -12,8 +12,17 @@ export const bugService = {
 }
 
 async function query(filterBy) {
+    console.log("filterBy:", filterBy);
+
     let bugsToDisplay = bugs
     try {
+        // Filter by creatorId
+        if (filterBy.creatorId) {
+            bugsToDisplay = bugsToDisplay.filter(
+                bug => bug.creator && bug.creator._id === filterBy.creatorId
+            )
+        }
+
         // Filter by title
         if (filterBy.title) {
             const regex = new RegExp(filterBy.title, 'i')

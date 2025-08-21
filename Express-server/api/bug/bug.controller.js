@@ -2,13 +2,14 @@ import { bugService } from './bug.service.js'
 import { loggerService } from '../../services/logger.service.js'
 
 export async function getBugs(req, res) {
-    const { title, minSeverity, labels, pageIdx, sortBy, sortDir } = req.query
+    const { title, minSeverity, labels, pageIdx, sortBy, sortDir, creatorId  } = req.query
     const filterBy = {
         title: title || '',
         minSeverity: minSeverity ? +minSeverity : 0,
         labels: labels ? (Array.isArray(labels) ? labels : [labels]) : [],
         sortBy: sortBy || '',          // ✅ parse sorting field
-        sortDir: sortDir || 'asc'      // ✅ parse sorting direction
+        sortDir: sortDir || 'asc',      // ✅ parse sorting direction
+        creatorId: creatorId || ''      // Filter by creatorId
     }
 
     if (pageIdx !== undefined) filterBy.pageIdx = +pageIdx

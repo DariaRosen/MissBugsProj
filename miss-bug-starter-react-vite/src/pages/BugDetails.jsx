@@ -33,6 +33,7 @@ export function BugDetails() {
         <p>Description: <span>{bug.description}</span></p>
         <p>Created At: <span>{new Date(bug.createdAt).toLocaleDateString()}</span></p>
         <p>Labels: <span>{bug.labels?.join(', ') || 'No labels'}</span></p>
+        <p>Creator: <span>{bug.creator?.fullname || 'Unknown'}</span></p>
         <Link to="/bug">Back to List</Link>
     </div>
 

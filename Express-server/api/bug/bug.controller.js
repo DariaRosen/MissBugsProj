@@ -1,8 +1,9 @@
 import { bugService } from './bug.service.js'
 import { loggerService } from '../../services/logger.service.js'
+import { authService } from '../auth/auth.service.js'
 
 export async function getBugs(req, res) {
-    const { title, minSeverity, labels, pageIdx, sortBy, sortDir, creatorId  } = req.query
+    const { title, minSeverity, labels, pageIdx, sortBy, sortDir, creatorId } = req.query
     const filterBy = {
         title: title || '',
         minSeverity: minSeverity ? +minSeverity : 0,
@@ -63,18 +64,26 @@ export async function getBug(req, res) {
 }
 
 export async function addBug(req, res) {
+    const loggedinUser = authService.validateToken(req.cookies.loginToken)
+    if (!loggedinUser) return res.status(401).send('Login first')
+
     try {
-        let { title, severity, labels, createdAt, description } = req.body
+        const { title, severity, labels, createdAt, description } = req.body
+        console.log("req.session?.user", req.session?.user);
 
         const bugToSave = {
             title,
             severity: +severity,
             labels: labels ? (Array.isArray(labels) ? labels : [labels]) : [],
             description: description || '',
-            createdAt: createdAt ? +createdAt : Date.now()
+            createdAt: createdAt ? +createdAt : Date.now(),
+            creator: {
+                _id: loggedinUser._id,
+                fullname: loggedinUser.fullname
+            }
         }
 
-        const savedBug = await bugService.save(bugToSave)
+        const savedBug = await bugService.save(bugToSave, loggedinUser)
         res.send({ savedBug })
     } catch (err) {
         console.error('Error saving bug:', err)
@@ -83,6 +92,8 @@ export async function addBug(req, res) {
 }
 
 export async function updateBug(req, res) {
+    const loggedinUser = authService.validateToken(req.cookies.loginToken)
+    if (!loggedinUser) return res.status(401).send('Login first')
     try {
         const existingBug = await bugService.getById(req.params.id)
         const { title, severity, description, labels } = req.body
@@ -94,7 +105,8 @@ export async function updateBug(req, res) {
             severity: +severity,
             description,
             labels: safeLabels,
-            createdAt: existingBug.createdAt
+            createdAt: existingBug.createdAt,
+            creator: existingBug.creator
         }
 
         const savedBug = await bugService.save(bugToSave)
@@ -106,6 +118,8 @@ export async function updateBug(req, res) {
 }
 
 export async function removeBug(req, res) {
+    const loggedinUser = authService.validateToken(req.cookies.loginToken)
+    if (!loggedinUser) return res.status(401).send('Login first')
     const bugId = req.params.id
     try {
         await bugService.remove(bugId)

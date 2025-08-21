@@ -98,14 +98,19 @@ async function remove(bugId) {
     }
 }
 
-async function save(bugToSave) {
+async function save(bugToSave, loggedinUser) {
     try {
-        if (bugToSave._id) {
+        if (bugToSave._id) { // Update existing bug
             const idx = bugs.findIndex(bug => bug._id === bugToSave._id)
             if (idx === -1) throw `Couldn't update bug with _id ${bugToSave._id}`
             bugs[idx] = bugToSave
-        } else {
+        } else { // Create new bug
             bugToSave._id = makeId()
+            bugToSave.createdAt = Date.now()
+            bugToSave.creator = {
+                _id: loggedinUser._id,
+                fullname: loggedinUser.fullname
+            }
             bugs.push(bugToSave)
         }
         await _saveBugsToFile()

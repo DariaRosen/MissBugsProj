@@ -63,8 +63,10 @@ export function AppHeader() {
         <nav className='app-nav'>
           <NavLink to="/">Home</NavLink> |<NavLink to="/bug">Bugs</NavLink> |
           <NavLink to="/about">About</NavLink> |
-          <NavLink to="/user">Users</NavLink>
+          <NavLink to="/user">Users</NavLink> |
+          {loggedinUser && <NavLink to={`/user/${loggedinUser._id}`}>Details</NavLink>}
         </nav>
+
         <h1>Bugs are Forever</h1>
       </div>
     </header>

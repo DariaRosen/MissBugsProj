@@ -8,6 +8,8 @@ export function BugPreview({ bug }) {
                 Severity: <span>{bug.severity}</span>
                 <br />
                 Created At: <span>{new Date(bug.createdAt).toLocaleDateString()}</span>
+                <br />
+                Creator: <span>{bug.creator?.fullname || 'Unknown'}</span>
             </p>
         </article>
     )

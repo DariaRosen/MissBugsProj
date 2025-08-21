@@ -24,7 +24,8 @@ async function query(filterBy = {}) {
             minSeverity: filterBy.minSeverity || 0,
             pageIdx: filterBy.pageIdx,
             sortBy: filterBy.sortBy,   // ✅ add sorting field
-            sortDir: filterBy.sortDir  // ✅ add sorting direction
+            sortDir: filterBy.sortDir,  // ✅ add sorting direction
+            creatorId: filterBy.creatorId || ''
         }
 
         var { data: bugs } = await axios.get(BASE_URL, { params })

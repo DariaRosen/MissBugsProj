@@ -6,6 +6,7 @@ import path from 'path'
 import { bugRoutes } from './api/bug/bug.routes.js'
 import { userRoutes } from './api/user/user.routes.js'
 import { authRoutes } from './api/auth/auth.routes.js'
+import session from 'express-session'
 
 const app = express()
 
@@ -26,10 +27,24 @@ app.use(express.json())
 app.use(express.static('public'))
 app.set('query parser', 'extended')
 
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'REPLACE_IN_PRODUCTION',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // set true if using HTTPS
+}))
+
 //*Routes
 app.use('/api/bug/', bugRoutes)
 app.use('/api/user/', userRoutes)
 app.use('/api/auth/', authRoutes)
+
+
+
+import { requireAuth } from './middlewares/requireAuth.middleware.js'
+app.get('/api/bug', requireAuth, (req, res) => {
+    res.send('ok, session is working')
+})
 
 app.get('/cookie', (req, res) => {
     let visitCount = req.cookies.myCookie || 0

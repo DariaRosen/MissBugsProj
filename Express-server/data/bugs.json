@@ -8,31 +8,10 @@
         "labels": [
             "critical"
         ],
-        "creator": { "_id": "u101", "fullname": "Puki Ja" }
-    },
-    {
-        "_id": "111",
-        "title": "aaa",
-        "severity": 55,
-        "createdAt": 1754991467975,
-        "description": "This is another bug description",
-        "labels": [
-            "critical",
-            "need-CR",
-            "main-branch"
-        ],
-        "creator": { "_id": "u102", "fullname": "Muki Ba" }
-    },
-    {
-        "_id": "555",
-        "title": "hhh",
-        "severity": 56,
-        "createdAt": 1642107359454,
-        "description": "This is another bug description",
-        "labels": [
-            "critical"
-        ],
-        "creator": { "_id": "u103", "fullname": "Tsuki Ca" }
+        "creator": {
+            "_id": "u101",
+            "fullname": "Puki Ja"
+        }
     },
     {
         "_id": "333",
@@ -45,47 +24,10 @@
             "need-CR",
             "dev-branch"
         ],
-        "creator": { "_id": "u101", "fullname": "Puki Ja" }
-    },
-    {
-        "title": "jjj",
-        "severity": 6,
-        "description": "jjjjj",
-        "createdAt": 1754991116828,
-        "_id": "nKSwnv",
-        "creator": { "_id": "u102", "fullname": "Muki Ba" }
-    },
-    {
-        "title": "kkk",
-        "severity": 8,
-        "description": "kkkkk",
-        "createdAt": 1754991467975,
-        "_id": "LHLUOT",
-        "creator": { "_id": "u103", "fullname": "Tsuki Ca" }
-    },
-    {
-        "title": "qqq",
-        "severity": 1,
-        "description": "qqq",
-        "createdAt": 1754991467975,
-        "_id": "5peeqa",
-        "creator": { "_id": "u101", "fullname": "Puki Ja" }
-    },
-    {
-        "title": "JJJ",
-        "severity": 1,
-        "description": "JJJJJ",
-        "createdAt": 1754991467975,
-        "_id": "KWBpH7",
-        "creator": { "_id": "u102", "fullname": "Muki Ba" }
-    },
-    {
-        "title": "KKK",
-        "severity": 100,
-        "description": "KKK",
-        "createdAt": 1754991467975,
-        "_id": "OdkYPl",
-        "creator": { "_id": "u103", "fullname": "Tsuki Ca" }
+        "creator": {
+            "_id": "u101",
+            "fullname": "Puki Ja"
+        }
     },
     {
         "title": "ddddd",
@@ -96,17 +38,78 @@
         "description": "",
         "createdAt": 1755156278711,
         "_id": "0lZ44A",
-        "creator": { "_id": "u101", "fullname": "Puki Ja" }
+        "creator": {
+            "_id": "u101",
+            "fullname": "Puki Ja"
+        }
     },
     {
-        "_id": "ExP3U8",
-        "title": "qqqqqq",
-        "severity": 3,
-        "createdAt": 1755160166032,
-        "description": "qqq",
+        "_id": "555",
+        "title": "hhh",
+        "severity": 56,
+        "createdAt": 1642107359454,
+        "description": "This is another bug description",
         "labels": [
             "critical"
         ],
-        "creator": { "_id": "u102", "fullname": "Muki Ba" }
+        "creator": {
+            "_id": "u103",
+            "fullname": "Tsuki Ca"
+        }
+    },
+    {
+        "title": "jjj",
+        "severity": 6,
+        "description": "jjjjj",
+        "createdAt": 1754991116828,
+        "_id": "nKSwnv",
+        "creator": {
+            "_id": "u102",
+            "fullname": "Muki Ba"
+        }
+    },
+    {
+        "title": "JJJ",
+        "severity": 1,
+        "description": "JJJJJ",
+        "createdAt": 1754991467975,
+        "_id": "KWBpH7",
+        "creator": {
+            "_id": "u102",
+            "fullname": "Muki Ba"
+        }
+    },
+    {
+        "title": "kkk",
+        "severity": 8,
+        "description": "kkkkk",
+        "createdAt": 1754991467975,
+        "_id": "LHLUOT",
+        "creator": {
+            "_id": "u103",
+            "fullname": "Tsuki Ca"
+        }
+    },
+    {
+        "title": "KKK",
+        "severity": 100,
+        "description": "KKK",
+        "createdAt": 1754991467975,
+        "_id": "OdkYPl",
+        "creator": {
+            "_id": "u103",
+            "fullname": "Tsuki Ca"
+        }
+    },
+    {
+        "title": "qqq",
+        "severity": 1,
+        "description": "qqq",
+        "createdAt": 1754991467975,
+        "_id": "5peeqa",
+        "creator": {
+            "_id": "u101",
+            "fullname": "Puki Ja"
+        }
     }
 ]

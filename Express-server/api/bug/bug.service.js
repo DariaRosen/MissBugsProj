@@ -77,7 +77,7 @@ async function query(filterBy) {
     }
 }
 
-function getById(bugId) {
+function getById(bugId, loggedinUser) {
     try {
         const bug = bugs.find(b => b._id === bugId)
         if (!bug) throw `Couldn't find bug with _id ${bugId}`
@@ -87,8 +87,15 @@ function getById(bugId) {
     }
 }
 
-async function remove(bugId) {
+async function remove(bugId, loggedinUser) {
     try {
+        const bugToRemove = await getById(bugId, loggedinUser)
+        console.log("loggedinUser:", loggedinUser);
+
+        console.log("bugToRemove:", bugToRemove);
+        console.log("!loggedinUser.isAdmin:", !loggedinUser.isAdmin);
+        console.log("bugToRemove.creator._id !== loggedinUser._id:", bugToRemove.creator._id !== loggedinUser._id);
+        if (!loggedinUser.isAdmin && bugToRemove.creator._id !== loggedinUser._id) throw new Error('Not authorized to remove this bug')
         const idx = bugs.findIndex(b => b._id === bugId)
         if (idx === -1) throw `Couldn't remove bug with _id ${bugId}`
         bugs.splice(idx, 1)
@@ -101,6 +108,7 @@ async function remove(bugId) {
 async function save(bugToSave, loggedinUser) {
     try {
         if (bugToSave._id) { // Update existing bug
+            if (!loggedinUser.isAdmin && bugToSave.creator._id !== loggedinUser._id) throw new Error('Not authorized to update this bug')
             const idx = bugs.findIndex(bug => bug._id === bugToSave._id)
             if (idx === -1) throw `Couldn't update bug with _id ${bugToSave._id}`
             bugs[idx] = bugToSave

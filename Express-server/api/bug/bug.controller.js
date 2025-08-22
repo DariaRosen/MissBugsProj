@@ -3,6 +3,8 @@ import { loggerService } from '../../services/logger.service.js'
 import { authService } from '../auth/auth.service.js'
 
 export async function getBugs(req, res) {
+    console.log("BBBBBBBBBBBBBBBB");
+
     const { title, minSeverity, labels, pageIdx, sortBy, sortDir, creatorId } = req.query
     const filterBy = {
         title: title || '',
@@ -26,7 +28,7 @@ export async function getBugs(req, res) {
 
 export async function getBug(req, res) {
     const bugId = req.params.id
-
+    console.log("cccccccccccccccccccccccc");
     // Read visitedBugs cookie or default to empty array
     let visitedBugs = []
     try {
@@ -64,13 +66,9 @@ export async function getBug(req, res) {
 }
 
 export async function addBug(req, res) {
-    const loggedinUser = authService.validateToken(req.cookies.loginToken)
-    if (!loggedinUser) return res.status(401).send('Login first')
-
+    const { loggedinUser } = req
     try {
         const { title, severity, labels, createdAt, description } = req.body
-        console.log("req.session?.user", req.session?.user);
-
         const bugToSave = {
             title,
             severity: +severity,
@@ -92,10 +90,9 @@ export async function addBug(req, res) {
 }
 
 export async function updateBug(req, res) {
-    const loggedinUser = authService.validateToken(req.cookies.loginToken)
-    if (!loggedinUser) return res.status(401).send('Login first')
+    const { loggedinUser } = req
     try {
-        const existingBug = await bugService.getById(req.params.id)
+        const existingBug = await bugService.getById(req.params.id, loggedinUser)
         const { title, severity, description, labels } = req.body
         const safeLabels = labels ? (Array.isArray(labels) ? labels : [labels]) : []
 
@@ -118,11 +115,13 @@ export async function updateBug(req, res) {
 }
 
 export async function removeBug(req, res) {
-    const loggedinUser = authService.validateToken(req.cookies.loginToken)
-    if (!loggedinUser) return res.status(401).send('Login first')
+    const { loggedinUser } = req
     const bugId = req.params.id
+    console.log("User is trying to remove bug:", bugId);
+    console.log("loggedinUser:", loggedinUser);
+    console.log("req.session:", req.session);
     try {
-        await bugService.remove(bugId)
+        await bugService.remove(bugId, loggedinUser)
         res.send({ message: 'Bug removed successfully' })
     } catch (err) {
         loggerService.error('Error removing bug:', err)

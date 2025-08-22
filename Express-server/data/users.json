@@ -29,5 +29,13 @@
         "score": "6",
         "_id": "ydKP8M",
         "isAdmin": false
+    },
+    {
+        "username": "dddd",
+        "password": "$2b$10$nXZreb1imIw3H18or3t5Lem4b1NcCrQB7ADjg6HhlBCWvclO9Zy22",
+        "fullname": "ddddd",
+        "_id": "A8JVWX",
+        "score": "1",
+        "isAdmin": true
     }
 ]

@@ -64,5 +64,5 @@ app.get('/*all', (req, res) => {
     })
 })
 
-const PORT = 3030
+const PORT = process.env.PORT || 3030
 app.listen(PORT, () => loggerService.info(`Server is running on http://localhost:${PORT}`))

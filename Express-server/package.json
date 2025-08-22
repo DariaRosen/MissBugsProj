@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node hello-node.js",
+    "start": "node server.js",
     "server:dev": "nodemon --ignore \"./data\" server.js",
     "dev:win": "set PORT=30030 & nodemon --ignore \"./data\" server.js"
   },

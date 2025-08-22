@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "server:dev": "nodemon --ignore \"./data\" server.js",
-    "dev:win": "set PORT=30030 & nodemon --ignore \"./data\" server.js"
+    "dev:win": "set PORT=3030 & nodemon --ignore \"./data\" server.js"
   },
   "keywords": [],
   "author": "",

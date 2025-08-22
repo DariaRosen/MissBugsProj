@@ -38,4 +38,8 @@ dist-ssr
 
 pkg/
 
+.env
+.vscode
+
+
 >>>>>>> 36e02be5f912eeee19eed5c03cf238f061af1ad9

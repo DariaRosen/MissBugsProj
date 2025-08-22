@@ -27,6 +27,7 @@ async function query(filterBy = {}) {
             sortDir: filterBy.sortDir,  // ✅ add sorting direction
             creatorId: filterBy.creatorId || ''
         }
+        console.log("Querying bugs with params:", params);
 
         var { data: bugs } = await axios.get(BASE_URL, { params })
         return bugs

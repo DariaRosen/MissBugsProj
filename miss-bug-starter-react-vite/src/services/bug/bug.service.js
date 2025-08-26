@@ -1,12 +1,4 @@
-import Axios from 'axios'
-
-var axios = Axios.create({
-    withCredentials: true,
-})
-
-const BASE_URL = (process.env.NODE_ENV !== 'development') ?
-    '/api/bug' :
-    '//localhost:3030/api/bug'
+import { httpService } from '../http.service'
 
 export const bugService = {
     query,
@@ -17,61 +9,31 @@ export const bugService = {
     getEmptyBug
 }
 
-
 async function query(filterBy = {}) {
-    try {
-        // Support sorting in backend
-        const params = {
-            txt: filterBy.txt || '',
-            minSeverity: filterBy.minSeverity || 0,
-            pageIdx: filterBy.pageIdx,
-            sortBy: filterBy.sortBy,   // ✅ add sorting field
-            sortDir: filterBy.sortDir,  // ✅ add sorting direction
-            creatorId: filterBy.creatorId || ''
-        }
-        console.log("Querying bugs with params:", params);
-
-        var { data: bugs } = await axios.get(BASE_URL, { params })
-        return bugs
-    } catch (err) {
-        console.log('err:', err)
-        throw err
+    const params = {
+        txt: filterBy.txt || '',
+        minSeverity: filterBy.minSeverity || 0,
+        pageIdx: filterBy.pageIdx,
+        sortBy: filterBy.sortBy || 'title',
+        sortDir: filterBy.sortDir || 'asc',
+        creatorId: filterBy.creatorId || ''
     }
+    return httpService.get('bug', params)
 }
 
-async function getById(bugId) {
-    try {
-        const res = await axios.get(BASE_URL + '/' + bugId)
-        return res.data
-    } catch (err) {
-        console.log('err:', err)
-        throw err
-    }
+function getById(bugId) {
+    return httpService.get(`bug/${bugId}`)
 }
 
-async function remove(bugId) {
-    const url = BASE_URL + '/' + bugId
-    try {
-        const { data: res } = await axios.delete(url)
-        return res.data
-    } catch (err) {
-        console.log('err:', err)
-        throw err
-    }
+function remove(bugId) {
+    return httpService.delete(`bug/${bugId}`)
 }
 
-async function save(bugToSave) {
-    try {
-        if (bugToSave._id) { // Update existing bug
-            const { data } = await axios.put(`${BASE_URL}/${bugToSave._id}`, bugToSave)
-            return data.savedBug
-        } else { // Create new bug
-            const { data } = await axios.post(BASE_URL, bugToSave)
-            return data.savedBug
-        }
-    } catch (err) {
-        console.log('err:', err)
-        throw err
+async function save(bug) {
+    if (bug._id) {
+        return httpService.put(`bug/${bug._id}`, bug)
+    } else {
+        return httpService.post('bug', bug)
     }
 }
 
@@ -80,8 +42,8 @@ function getDefaultFilter() {
         txt: '',
         minSeverity: 0,
         pageIdx: undefined,
-        sortBy: 'title',   // ✅ default sort field
-        sortDir: 'asc'     // ✅ default direction
+        sortBy: 'title',
+        sortDir: 'asc'
     }
 }
 

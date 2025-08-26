@@ -1,72 +1,65 @@
-import Axios from 'axios'
-
-var axios = Axios.create({
-    withCredentials: true,
-})
+import { httpService } from '../http.service'
 
 const STORAGE_KEY_LOGGEDIN_USER = 'loggedinUser'
-// console.log('process.env.NODE_ENV:', process.env.NODE_ENV)
-const BASE_URL = (process.env.NODE_ENV !== 'development') ?
-    '/api/' :
-    '//localhost:3030/api/'
-    
-
-const BASE_USER_URL = BASE_URL + 'user/'
-const BASE_AUTH_URL = BASE_URL + 'auth/'
 
 export const userService = {
     login,
     logout,
     signup,
-    getLoggedinUser,
-    saveLocalUser,
-
     getUsers,
     getById,
     remove,
     update,
     save,
     getEmptyUser,
+    getLoggedinUser,
 }
 
-window.userService = userService
-
-
-async function login(credentials) {
-    const { data: user } = await axios.post(BASE_AUTH_URL + 'login', credentials)
-    if (user) {
-        return saveLocalUser(user)
-    }
+function getUsers() {
+    return httpService.get('user')
 }
 
-async function signup(credentials) {
-    const { data: user } = await axios.post(BASE_AUTH_URL + 'signup', credentials)
-    return saveLocalUser(user)
+function getById(userId) {
+    return httpService.get(`user/${userId}`)
 }
 
-async function logout() {
-    await axios.post(BASE_AUTH_URL + 'logout')
-    sessionStorage.removeItem(STORAGE_KEY_LOGGEDIN_USER)
-}
-
-async function getUsers() {
-    const { data: users } = await axios.get(BASE_USER_URL)
-    return users
-}
-
-async function getById(userId) {
-    const { data: user } = await axios.get(BASE_USER_URL + userId)
-    return user
-}
-
-async function remove(userId) {
-    return await axios.delete(BASE_USER_URL + userId)
+function remove(userId) {
+    return httpService.delete(`user/${userId}`)
 }
 
 async function update(userToUpdate) {
-    const { data: updatedUser } = await axios.put(BASE_USER_URL + userToUpdate._id, userToUpdate)
-    if (getLoggedinUser().id === updatedUser.id) saveLocalUser(updatedUser)
+    const updatedUser = await httpService.put(`user/${userToUpdate._id}`, userToUpdate)
+    if (getLoggedinUser()?._id === updatedUser._id) _saveLocalUser(updatedUser)
     return updatedUser
+}
+
+async function save(user) {
+    if (user._id) {
+        const updatedUser = await httpService.put(`user/${user._id}`, user)
+        if (getLoggedinUser()?._id === updatedUser._id) _saveLocalUser(updatedUser)
+        return updatedUser
+    } else {
+        return httpService.post('user', user)
+    }
+}
+
+async function login(credentials) {
+    const user = await httpService.post('auth/login', credentials)
+    if (user) return _saveLocalUser(user)
+}
+
+async function signup(credentials) {
+    if (!credentials.imgUrl) {
+        credentials.imgUrl = 'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png'
+    }
+    credentials.score = 10000
+    const user = await httpService.post('auth/signup', credentials)
+    return _saveLocalUser(user)
+}
+
+async function logout() {
+    sessionStorage.removeItem(STORAGE_KEY_LOGGEDIN_USER)
+    return httpService.post('auth/logout')
 }
 
 function getEmptyUser() {
@@ -80,25 +73,18 @@ function getEmptyUser() {
     }
 }
 
-function saveLocalUser(user) {
-    user = { _id: user._id, fullname: user.fullname, isAdmin: user.isAdmin }
-    sessionStorage.setItem(STORAGE_KEY_LOGGEDIN_USER, JSON.stringify(user))
-    return user
-}
-
 function getLoggedinUser() {
     return JSON.parse(sessionStorage.getItem(STORAGE_KEY_LOGGEDIN_USER))
 }
 
-async function save(user) {
-    if (user._id) {
-        // update existing
-        const { data: updatedUser } = await axios.put(BASE_USER_URL + user._id, user)
-        if (getLoggedinUser()?._id === updatedUser._id) saveLocalUser(updatedUser)
-        return updatedUser
-    } else {
-        // create new
-        const { data: newUser } = await axios.post(BASE_USER_URL, user)
-        return newUser
+function _saveLocalUser(user) {
+    user = {
+        _id: user._id,
+        fullname: user.fullname,
+        imgUrl: user.imgUrl,
+        score: user.score,
+        isAdmin: user.isAdmin
     }
+    sessionStorage.setItem(STORAGE_KEY_LOGGEDIN_USER, JSON.stringify(user))
+    return user
 }

@@ -35,19 +35,19 @@ async function query(filterBy) {
         }
 
         // Filter by labels
-        // if (filterBy.labels && filterBy.labels.length) {
-        //     const labelsArray = Array.isArray(filterBy.labels)
-        //         ? filterBy.labels
-        //         : [filterBy.labels]
-        //     bugsToDisplay = bugsToDisplay.filter(bug =>
-        //         Array.isArray(bug.labels) &&
-        //         labelsArray.every(labelFilter =>
-        //             bug.labels.some(bugLabel =>
-        //                 bugLabel.toLowerCase().includes(labelFilter.toLowerCase())
-        //             )
-        //         )
-        //     )
-        // }
+        if (filterBy.labels && filterBy.labels.length) {
+            const labelsArray = Array.isArray(filterBy.labels)
+                ? filterBy.labels
+                : [filterBy.labels]
+            bugsToDisplay = bugsToDisplay.filter(bug =>
+                Array.isArray(bug.labels) &&
+                labelsArray.every(labelFilter =>
+                    bug.labels.some(bugLabel =>
+                        bugLabel.toLowerCase().includes(labelFilter.toLowerCase())
+                    )
+                )
+            )
+        }
 
         // ✅ Sorting
         if (filterBy.sortBy) {

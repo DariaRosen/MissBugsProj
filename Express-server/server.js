@@ -1,31 +1,41 @@
-import express from 'express'
-import { loggerService } from './services/logger.service.js'
-import cors from 'cors'
-import cookieParser from 'cookie-parser'
+import http from 'http'
 import path from 'path'
+import cors from 'cors'
+import express from 'express'
+import cookieParser from 'cookie-parser'
+import session from 'express-session'
+
+import { loggerService } from './services/logger.service.js'
 import { bugRoutes } from './api/bug/bug.routes.js'
 import { userRoutes } from './api/user/user.routes.js'
 import { authRoutes } from './api/auth/auth.routes.js'
-import session from 'express-session'
+import { msgRoutes } from './api/msg/msg.routes.js'
+
+import { setupAsyncLocalStorage } from './middlewares/setupAls.middleware.js'
 
 const app = express()
+const server = http.createServer(app)
 
-const corsOptions = {
-    origin: [
-        'http://localhost:5173',
-        'http://127.0.0.1:5173',
-        'http://localhost:5174',
-        'http://127.0.0.1:5174',
-    ],
-    credentials: true,
+// Express App Config
+app.use(cookieParser()) 
+app.use(express.json())
+
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.resolve('public')))
+} else {
+    const corsOptions = {
+        origin: [
+            'http://127.0.0.1:8080',
+            'http://localhost:3000',
+            'http://127.0.0.1:5173',
+            'http://localhost:5173'
+        ],
+        credentials: true
+    }
+    app.use(cors(corsOptions))
 }
 
-//*Express configuration
-app.use(cors(corsOptions))
-app.use(cookieParser())
-app.use(express.json())
-app.use(express.static('public'))
-app.set('query parser', 'extended')
+app.all('/*all', setupAsyncLocalStorage)
 
 app.use(session({
     secret: process.env.SESSION_SECRET || 'REPLACE_IN_PRODUCTION',
@@ -38,11 +48,16 @@ app.use(session({
 app.use('/api/bug/', bugRoutes)
 app.use('/api/user/', userRoutes)
 app.use('/api/auth/', authRoutes)
+app.use('/api/msg', msgRoutes)
 
+// Make every unhandled server-side-route match index.html
+// so when requesting http://localhost:3030/unhandled-route... 
+// it will still serve the index.html file
+// and allow vue/react-router to take it from there
 
 
 import { requireAuth } from './middlewares/requireAuth.middleware.js'
-app.get('/api/bug', requireAuth, (req, res) => {
+app.get('/api/test-session', requireAuth, (req, res) => {
     res.send('ok, session is working')
 })
 
@@ -64,5 +79,11 @@ app.get('/*all', (req, res) => {
     })
 })
 
-const PORT = process.env.PORT || 3030
-app.listen(PORT, () => loggerService.info(`Server is running on http://localhost:${PORT}`))
+import { logger } from './services/logger.service.js'
+const port = process.env.PORT || 3030
+
+// app.listen(PORT, () => loggerService.info(`Server is running on http://localhost:${PORT}`))
+
+server.listen(port, () => {
+    logger.info('Server is running on: ' + `http://localhost:${port}/`)
+})

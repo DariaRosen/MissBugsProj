@@ -1,114 +1,130 @@
-import fs from 'fs'
-import { readJsonFile, makeId } from '../../services/util.service.js'
-
-const users = readJsonFile('./data/users.json')
-const PAGE_SIZE = 3 // Backend controls page size
+import { dbService } from '../../services/db.service.js'
+import { loggerService } from '../../services/logger.service.js'
+import { msgService } from '../msg/msg.service.js'
+import { ObjectId } from 'mongodb'
 
 export const userService = {
-    query,
-    getById,
-    remove,
-    save,
-    getByUsername
+    add,         // Create (Signup)
+    getById,     // Read (Profile page)
+    update,      // Update (Edit profile)
+    remove,      // Delete (remove user)
+    query,       // List (of users)
+    getByUsername, // Used for Login
 }
 
-async function query(filterBy) {
-    let usersToDisplay = users
+async function query(filterBy = {}) {
+    const criteria = _buildCriteria(filterBy)
     try {
-        // Filter by title
-        if (filterBy.title) {
-            const regex = new RegExp(filterBy.title, 'i')
-            usersToDisplay = usersToDisplay.filter(user => regex.test(user.title))
-        }
+        const collection = await dbService.getCollection('user')
+        let users = await collection.find(criteria).toArray()
 
-        // Filter by severity
-        if (filterBy.minSeverity) {
-            usersToDisplay = usersToDisplay.filter(user => user.severity >= filterBy.minSeverity)
-        }
+        users = users.map(user => {
+            delete user.password
+            user.createdAt = user._id.getTimestamp()
+            return user
+        })
 
-        // Filter by labels
-        if (filterBy.labels && filterBy.labels.length) {
-            const labelsArray = Array.isArray(filterBy.labels)
-                ? filterBy.labels
-                : [filterBy.labels] // in case query param is string
-            usersToDisplay = usersToDisplay.filter(user =>
-                Array.isArray(user.labels) &&
-                labelsArray.every(labelFilter =>
-                    user.labels.some(userLabel => userLabel.toLowerCase().includes(labelFilter.toLowerCase()))
-                )
-            )
-        }
-
-        // Paging
-        if ('pageIdx' in filterBy) {
-            const startIdx = filterBy.pageIdx * PAGE_SIZE // 0
-            usersToDisplay = usersToDisplay.slice(startIdx, startIdx + PAGE_SIZE)
-        }
-
-        return usersToDisplay
-
+        return users
     } catch (err) {
+        loggerService.error('cannot find users', err)
         throw err
     }
 }
 
-function getById(userId) {
+async function getById(userId) {
     try {
-        const user = users.find(b => b._id === userId)
-        if (!user) throw `Couldn't find user with _id ${userId}`
-        return user
+        let criteria = { _id: ObjectId.createFromHexString(userId) }
 
+        const collection = await dbService.getCollection('user')
+        const user = await collection.findOne(criteria)
+        if (!user) throw `User with id ${userId} not found`
+
+        delete user.password
+
+        // attach given messages
+        criteria = { byUserId: userId }
+        user.givenMessages = await msgService.query(criteria)
+        user.givenMessages = user.givenMessages.map(message => {
+            delete message.byUser
+            return message
+        })
+
+        return user
     } catch (err) {
+        loggerService.error(`while finding user by id: ${userId}`, err)
+        throw err
+    }
+}
+
+async function getByUsername(username) {
+    try {
+        const collection = await dbService.getCollection('user')
+        const user = await collection.findOne({ username })
+        return user
+    } catch (err) {
+        loggerService.error(`while finding user by username: ${username}`, err)
         throw err
     }
 }
 
 async function remove(userId) {
     try {
-        const idx = users.findIndex(b => b._id === userId)
-        if (idx === -1) throw `Couldn't remove user with _id ${userId}`
-        users.splice(idx, 1)
-        return _saveUsersToFile()
+        const criteria = { _id: ObjectId.createFromHexString(userId) }
+        const collection = await dbService.getCollection('user')
+        await collection.deleteOne(criteria)
+        return userId
     } catch (err) {
+        loggerService.error(`cannot remove user ${userId}`, err)
         throw err
     }
 }
 
-async function save(userToSave) {
+async function update(user) {
     try {
-        if (userToSave._id) {
-            const idx = users.findIndex(user => user._id === userToSave._id)
-            console.log('idx:', idx);
-            if (idx === -1) throw `Couldn't update user with _id ${userToSave._id}`
-            users[idx] = userToSave
-        } else {
-            userToSave._id = makeId()
-            users.push(userToSave)
+        const userToSave = {
+            _id: ObjectId.createFromHexString(user._id), // ensure ObjectId
+            fullname: user.fullname,
+            score: user.score,
         }
-        await _saveUsersToFile()
+        const collection = await dbService.getCollection('user')
+        await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
         return userToSave
     } catch (err) {
+        loggerService.error(`cannot update user ${user._id}`, err)
         throw err
     }
 }
 
-function _saveUsersToFile(path = './data/users.json') {
-    return new Promise((resolve, reject) => {
-        const data = JSON.stringify(users, null, 4)
-        fs.writeFile(path, data, (err) => {
-            if (err) return reject(err)
-            resolve()
-        })
-    })
-}
-
-async function getByUsername(username) {
+async function add(user) {
     try {
-        const user = users.find(user => user.username === username)
-        // if (!user) throw `User not found by username : ${username}`
-        return user
+        const userToAdd = {
+            username: user.username,
+            password: user.password, // TODO: hash before saving
+            fullname: user.fullname,
+            imgUrl: user.imgUrl,
+            isAdmin: user.isAdmin || false,
+            score: 100,
+        }
+        const collection = await dbService.getCollection('user')
+        await collection.insertOne(userToAdd)
+        return userToAdd
     } catch (err) {
-        loggerService.error('userService[getByUsername] : ', err)
+        loggerService.error('cannot add user', err)
         throw err
     }
+}
+
+function _buildCriteria(filterBy) {
+    const criteria = {}
+    if (filterBy.txt) {
+        const txtCriteria = { $regex: filterBy.txt, $options: 'i' }
+        criteria.$or = [
+            { username: txtCriteria },
+            { fullname: txtCriteria },
+        ]
+    }
+    if (filterBy.minBalance) {
+        criteria.score = { $gte: filterBy.minBalance }
+    }
+    return criteria
 }

@@ -1,16 +1,16 @@
-import { logger } from '../../services/logger.service.js'
+import { loggerService } from '../../services/logger.service.js'
 // import { socketService } from '../../services/socket.service.js'
 import { userService } from '../user/user.service.js'
 import { authService } from '../auth/auth.service.js'
 import { msgService } from './msg.service.js'
 
-export async function getMsgs(req, res) {
+export async function getMsg(req, res) {
     try {
-        const msgs = await msgService.query(req.query)
-        res.send(msgs)
+        const msg = await msgService.query(req.query)
+        res.send(msg)
     } catch (err) {
-        logger.error('Cannot get msgs', err)
-        res.status(400).send({ err: 'Failed to get msgs' })
+        loggerService.error('Cannot get msg', err)
+        res.status(400).send({ err: 'Failed to get msg' })
     }
 }
 
@@ -27,7 +27,7 @@ export async function deleteMsg(req, res) {
             res.status(400).send({ err: 'Cannot remove msg' })
         }
     } catch (err) {
-        logger.error('Failed to delete msg', err)
+        loggerService.error('Failed to delete msg', err)
         res.status(400).send({ err: 'Failed to delete msg' })
     }
 }
@@ -63,7 +63,7 @@ export async function addMsg(req, res) {
 
         res.send(msg)
     } catch (err) {
-        logger.error('Failed to add msg', err)
+        loggerService.error('Failed to add msg', err)
         res.status(400).send({ err: 'Failed to add msg' })
     }
 }

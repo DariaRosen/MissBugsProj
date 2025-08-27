@@ -3,8 +3,6 @@ import { loggerService } from '../../services/logger.service.js'
 import { authService } from '../auth/auth.service.js'
 
 export async function getBugs(req, res) {
-    console.log("BBBBBBBBBBBBBBBB");
-
     const { title, minSeverity, labels, pageIdx, sortBy, sortDir, creatorId } = req.query
     const filterBy = {
         title: title || '',

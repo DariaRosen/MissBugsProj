@@ -12,8 +12,16 @@ export const bugService = {
 }
 
 async function query(filterBy) {
-    console.log("filterBy:", filterBy);
+    const criteria = _buildCriteria(filterBy)
+    const sort = _buildSort(filterBy)
+    const collection = await dbService.getCollection('bug')
+    var bugCursor = await collection.find(criteria, {sort})
 
+    if (filterBy.pageIdx !== undefined) {
+        bugCursor.skip(filterBy.pageIdx * PAGE_SIZE).limit(PAGE_SIZE)
+    }
+
+    const bugs = bugCursor.toArray()
     let bugsToDisplay = bugs
     try {
         // Filter by creatorId
@@ -136,4 +144,24 @@ function _saveBugsToFile(path = './data/bugs.json') {
             resolve()
         })
     })
+}
+
+function _buildCriteria(filterBy) {
+    const criteria = {
+        vendor: { $regex: filterBy.txt, $options: 'i' },
+        speed: { $gte: filterBy.minSpeed },
+    }
+    return criteria
+}
+
+function _buildPagination(filterBy) {
+    const pagination = {}
+    if (filterBy.page) pagination.page = filterBy.page
+    if (filterBy.limit) pagination.limit = filterBy.limit
+    return pagination
+}
+
+function _buildSort(filterBy) {
+    if (!filterBy.sortField) return {}
+    return { [filterBy.sortField]: filterBy.sortDir }
 }

@@ -1,0 +1,58 @@
+[
+  {
+    "_id": "m101",
+    "txt": "Fix that bug already",
+    "aboutBugId": "vawNC3",
+    "byUserId": "u102",
+    "createdAt": 1755201001000
+  },
+  {
+    "_id": "m102",
+    "txt": "Reproduced on Chrome 139. Stack trace attached.",
+    "aboutBugId": "333",
+    "byUserId": "u101",
+    "createdAt": 1755202002000
+  },
+  {
+    "_id": "m103",
+    "txt": "Severity seems overstated. Can we lower to medium?",
+    "aboutBugId": "555",
+    "byUserId": "u103",
+    "createdAt": 1755203003000
+  },
+  {
+    "_id": "m104",
+    "txt": "Adding to sprint backlog.",
+    "aboutBugId": "KWBpH7",
+    "byUserId": "u101",
+    "createdAt": 1755204004000
+  },
+  {
+    "_id": "m105",
+    "txt": "Cannot reproduce on my machine. Need steps.",
+    "aboutBugId": "LHLUOT",
+    "byUserId": "u102",
+    "createdAt": 1755205005000
+  },
+  {
+    "_id": "m106",
+    "txt": "Linked PR #142 closes this.",
+    "aboutBugId": "OdkYPl",
+    "byUserId": "u103",
+    "createdAt": 1755206006000
+  },
+  {
+    "_id": "m107",
+    "txt": "Please add a failing test case.",
+    "aboutBugId": "5peeqa",
+    "byUserId": "u101",
+    "createdAt": 1755207007000
+  },
+  {
+    "_id": "m108",
+    "txt": "QA verified on staging.",
+    "aboutBugId": "0lZ44A",
+    "byUserId": "u102",
+    "createdAt": 1755208008000
+  }
+]

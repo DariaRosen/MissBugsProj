@@ -16,6 +16,7 @@
   "description": "",
   "type": "module",
   "dependencies": {
+    "async_hooks": "^1.0.0",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",

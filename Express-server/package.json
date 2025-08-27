@@ -4,8 +4,10 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "server:dev": "nodemon --ignore \"./data\" server.js",
+    "start": "set NODE_ENV=production && node server.js",
+    "start:Mac": "NODE_ENV=production node server.js",
+    "server:dev": "set NODE_ENV=development && nodemon --ignore \"./data\" server.js",
+    "server:dev:Mac": "NODE_ENV=development nodemon --ignore \"./data\" server.js",
     "dev:win": "set PORT=3030 & nodemon --ignore \"./data\" server.js",
     "dev": "vite",
     "dev:local": "set VITE_LOCAL=true && vite"

@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 import { asyncLocalStorage } from '../../services/als.service.js'
-import { logger } from '../../services/logger.service.js'
+import { loggerService } from '../../services/logger.service.js'
 import { dbService } from '../../services/db.service.js'
 
 export const msgService = { query, remove, add }
@@ -49,7 +49,7 @@ async function query(filterBy = {}) {
 
         return msgs
     } catch (err) {
-        logger.error('cannot get msgs', err)
+        loggerService.error('cannot get msgs', err)
         throw err
     }
 }
@@ -69,7 +69,7 @@ async function remove(msgId) {
         const { deletedCount } = await collection.deleteOne(criteria)
         return deletedCount
     } catch (err) {
-        logger.error(`cannot remove msg ${msgId}`, err)
+        loggerService.error(`cannot remove msg ${msgId}`, err)
         throw err
     }
 }
@@ -86,7 +86,7 @@ async function add(msg) {
 
         return msgToAdd
     } catch (err) {
-        logger.error('cannot add msg', err)
+        loggerService.error('cannot add msg', err)
         throw err
     }
 }

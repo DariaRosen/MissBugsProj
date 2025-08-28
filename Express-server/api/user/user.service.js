@@ -4,12 +4,13 @@ import { msgService } from '../msg/msg.service.js'
 import { ObjectId } from 'mongodb'
 
 export const userService = {
-    add,         // Create (Signup)
-    getById,     // Read (Profile page)
-    update,      // Update (Edit profile)
-    remove,      // Delete (remove user)
-    query,       // List (of users)
+    add,           // Create (Signup)
+    getById,       // Read (Profile page)
+    update,        // Update (Edit profile)
+    remove,        // Delete (remove user)
+    query,         // List (of users)
     getByUsername, // Used for Login
+    save,          // For frontend save() (add or update)
 }
 
 async function query(filterBy = {}) {
@@ -20,7 +21,8 @@ async function query(filterBy = {}) {
 
         users = users.map(user => {
             delete user.password
-            user.createdAt = user._id.getTimestamp()
+            // Only call getTimestamp if _id is ObjectId
+            if (user._id instanceof ObjectId) user.createdAt = user._id.getTimestamp()
             return user
         })
 
@@ -33,8 +35,7 @@ async function query(filterBy = {}) {
 
 async function getById(userId) {
     try {
-        let criteria = { _id: ObjectId.createFromHexString(userId) }
-
+        const criteria = { _id: ObjectId.createFromHexString(userId) }
         const collection = await dbService.getCollection('Users')
         const user = await collection.findOne(criteria)
         if (!user) throw `User with id ${userId} not found`
@@ -42,11 +43,11 @@ async function getById(userId) {
         delete user.password
 
         // attach given messages
-        criteria = { byUserId: userId }
-        user.givenMessages = await msgService.query(criteria)
-        user.givenMessages = user.givenMessages.map(message => {
-            delete message.byUser
-            return message
+        const messagesCriteria = { byUserId: userId }
+        user.givenMessages = await msgService.query(messagesCriteria)
+        user.givenMessages = user.givenMessages.map(msg => {
+            delete msg.byUser
+            return msg
         })
 
         return user
@@ -70,7 +71,7 @@ async function getByUsername(username) {
 async function remove(userId) {
     try {
         const criteria = { _id: ObjectId.createFromHexString(userId) }
-        const collection = await dbService.getCollection('user')
+        const collection = await dbService.getCollection('Users')
         await collection.deleteOne(criteria)
         return userId
     } catch (err) {
@@ -82,9 +83,11 @@ async function remove(userId) {
 async function update(user) {
     try {
         const userToSave = {
-            _id: ObjectId.createFromHexString(user._id), // ensure ObjectId
+            _id: ObjectId.createFromHexString(user._id),
             fullname: user.fullname,
-            score: user.score,
+            score: +user.score, // ensure number
+            isAdmin: user.isAdmin || false,
+            imgUrl: user.imgUrl || '',
         }
         const collection = await dbService.getCollection('Users')
         await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
@@ -101,9 +104,9 @@ async function add(user) {
             username: user.username,
             password: user.password, // TODO: hash before saving
             fullname: user.fullname,
-            imgUrl: user.imgUrl,
+            imgUrl: user.imgUrl || '',
             isAdmin: user.isAdmin || false,
-            score: 100,
+            score: +user.score || 100,
         }
         const collection = await dbService.getCollection('Users')
         await collection.insertOne(userToAdd)
@@ -112,6 +115,12 @@ async function add(user) {
         loggerService.error('cannot add user', err)
         throw err
     }
+}
+
+// FRONTEND-FRIENDLY save()
+async function save(user) {
+    if (user._id) return update(user)
+    return add(user)
 }
 
 function _buildCriteria(filterBy) {
@@ -124,7 +133,7 @@ function _buildCriteria(filterBy) {
         ]
     }
     if (filterBy.minBalance) {
-        criteria.score = { $gte: filterBy.minBalance }
+        criteria.score = { $gte: +filterBy.minBalance }
     }
     return criteria
 }

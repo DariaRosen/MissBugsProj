@@ -16,6 +16,7 @@ export const userService = {
 }
 
 function getUsers() {
+    console.log('Getting users');
     return httpService.get('user')
 }
 

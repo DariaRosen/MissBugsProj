@@ -47,6 +47,7 @@ export function LoginSignup({ onSignup, onLogin }) {
         setIsSignup(!isSignup)
     }
 
+    if (!users.length) return <div>Loading...</div>
     return (
         <div className="login-page">
             <p>

@@ -15,7 +15,7 @@ export const userService = {
 async function query(filterBy = {}) {
     const criteria = _buildCriteria(filterBy)
     try {
-        const collection = await dbService.getCollection('user')
+        const collection = await dbService.getCollection('Users')
         let users = await collection.find(criteria).toArray()
 
         users = users.map(user => {
@@ -35,7 +35,7 @@ async function getById(userId) {
     try {
         let criteria = { _id: ObjectId.createFromHexString(userId) }
 
-        const collection = await dbService.getCollection('user')
+        const collection = await dbService.getCollection('Users')
         const user = await collection.findOne(criteria)
         if (!user) throw `User with id ${userId} not found`
 
@@ -58,7 +58,7 @@ async function getById(userId) {
 
 async function getByUsername(username) {
     try {
-        const collection = await dbService.getCollection('user')
+        const collection = await dbService.getCollection('Users')
         const user = await collection.findOne({ username })
         return user
     } catch (err) {
@@ -86,7 +86,7 @@ async function update(user) {
             fullname: user.fullname,
             score: user.score,
         }
-        const collection = await dbService.getCollection('user')
+        const collection = await dbService.getCollection('Users')
         await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
         return userToSave
     } catch (err) {
@@ -105,7 +105,7 @@ async function add(user) {
             isAdmin: user.isAdmin || false,
             score: 100,
         }
-        const collection = await dbService.getCollection('user')
+        const collection = await dbService.getCollection('Users')
         await collection.insertOne(userToAdd)
         return userToAdd
     } catch (err) {

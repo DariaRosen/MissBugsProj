@@ -8,7 +8,7 @@ export const msgService = { query, remove, add }
 async function query(filterBy = {}) {
     try {
         const criteria = _buildCriteria(filterBy)
-        const collection = await dbService.getCollection('msg')
+        const collection = await dbService.getCollection('Messages')
 
         var msgs = await collection.aggregate([
             {
@@ -57,7 +57,7 @@ async function query(filterBy = {}) {
 async function remove(msgId) {
     try {
         const { loggedinUser } = asyncLocalStorage.getStore()
-        const collection = await dbService.getCollection('msg')
+        const collection = await dbService.getCollection('Messages')
 
         const criteria = { _id: ObjectId.createFromHexString(msgId) }
 
@@ -81,7 +81,7 @@ async function add(msg) {
             aboutBugId: ObjectId.createFromHexString(msg.aboutBugId),
             txt: msg.txt,
         }
-        const collection = await dbService.getCollection('msg')
+        const collection = await dbService.getCollection('Messages')
         await collection.insertOne(msgToAdd)
 
         return msgToAdd

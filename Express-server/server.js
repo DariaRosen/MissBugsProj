@@ -46,6 +46,7 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false } // set true if using HTTPS
 }))
+
 //*Routes
 app.use('/api/bug/', bugRoutes)
 app.use('/api/user/', userRoutes)
@@ -57,10 +58,12 @@ app.use('/api/msg', msgRoutes)
 // it will still serve the index.html file
 // and allow vue/react-router to take it from there
 
+
 import { requireAuth } from './middlewares/requireAuth.middleware.js'
 app.get('/api/test-session', requireAuth, (req, res) => {
     res.send('ok, session is working')
 })
+
 app.get('/cookie', (req, res) => {
     let visitCount = req.cookies.myCookie || 0
     visitCount++
@@ -68,6 +71,7 @@ app.get('/cookie', (req, res) => {
     res.cookie('myCookie', visitCount)
     res.send(`Cookie value: ${visitCount}`)
 })
+
 //* For SPA (Single Page Application) support - catch-all routes and sent to index.html
 app.get('/*all', (req, res) => {
     res.sendFile(path.resolve('public/index.html'), (err) => {
@@ -77,8 +81,8 @@ app.get('/*all', (req, res) => {
         }
     })
 })
-// const port = process.env.PORT || 3030
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 3030
+// const port = process.env.PORT || 5000
 
 // app.listen(PORT, () => loggerService.info(`Server is running on http://localhost:${PORT}`))
 

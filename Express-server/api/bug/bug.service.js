@@ -16,17 +16,22 @@ export const bugService = {
 
 async function query(filterBy = {}) {
     try {
+        console.log("filterBy", filterBy);
+
         const criteria = _buildCriteria(filterBy)
         const sort = _buildSort(filterBy)
 
-        const collection = await dbService.getCollection('bug')
+        const collection = await dbService.getCollection('Bugs')
+
         var bugCursor = collection.find(criteria, { sort })
+
 
         if (filterBy.pageIdx !== undefined) {
             bugCursor = bugCursor.skip(filterBy.pageIdx * PAGE_SIZE).limit(PAGE_SIZE)
         }
 
         const bugs = await bugCursor.toArray()
+        console.log("bugs", bugs);
         return bugs
     } catch (err) {
         loggerService.error('cannot find bugs', err)
@@ -37,7 +42,7 @@ async function query(filterBy = {}) {
 async function getById(bugId) {
     try {
         const criteria = { _id: ObjectId.createFromHexString(bugId) }
-        const collection = await dbService.getCollection('bug')
+        const collection = await dbService.getCollection('Bugs')
         const bug = await collection.findOne(criteria)
 
         if (!bug) throw `Couldn't find bug with _id ${bugId}`
@@ -58,7 +63,7 @@ async function remove(bugId) {
         const criteria = { _id: ObjectId.createFromHexString(bugId) }
         if (!isAdmin) criteria['creator._id'] = userId
 
-        const collection = await dbService.getCollection('bug')
+        const collection = await dbService.getCollection('Bugs')
         const res = await collection.deleteOne(criteria)
 
         if (res.deletedCount === 0) throw new Error('Not authorized to remove this bug')
@@ -71,7 +76,7 @@ async function remove(bugId) {
 
 async function add(bug) {
     try {
-        const collection = await dbService.getCollection('bug')
+        const collection = await dbService.getCollection('Bugs')
         await collection.insertOne(bug)
         return bug
     } catch (err) {
@@ -90,7 +95,7 @@ async function update(bug) {
             description: bug.description,
         }
 
-        const collection = await dbService.getCollection('bug')
+        const collection = await dbService.getCollection('Bugs')
         await collection.updateOne(criteria, { $set: bugToSave })
         return bug
     } catch (err) {

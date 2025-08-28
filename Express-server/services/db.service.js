@@ -11,9 +11,13 @@ var dbConn = null
 async function getCollection(collectionName) {
     try {
         const db = await _connect()
+        console.log("1111111111111");
+        debugger;
         const collection = await db.collection(collectionName)
+        console.log('✅ Connected to DB:', config.dbName)
         return collection
     } catch (err) {
+        console.error('Cannot connect to DB', err)
         loggerService.error('Failed to get Mongo collection', err)
         throw err
     }

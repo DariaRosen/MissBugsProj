@@ -83,7 +83,7 @@ async function remove(userId) {
 async function update(user) {
     try {
         const userToSave = {
-            _id: ObjectId.createFromHexString(user._id),
+            _id: user._id instanceof ObjectId ? user._id : ObjectId.createFromHexString(user._id),
             fullname: user.fullname,
             score: +user.score, // ensure number
             isAdmin: user.isAdmin || false,
@@ -97,6 +97,7 @@ async function update(user) {
         throw err
     }
 }
+
 
 async function add(user) {
     try {

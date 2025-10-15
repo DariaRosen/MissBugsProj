@@ -1,10 +1,9 @@
 import { ObjectId } from 'mongodb'
-
 import { loggerService } from '../../services/logger.service.js'
 import { dbService } from '../../services/db.service.js'
 import { asyncLocalStorage } from '../../services/als.service.js'
 
-const PAGE_SIZE = 3
+const PAGE_SIZE = 4
 
 export const bugService = {
     query,
@@ -16,23 +15,16 @@ export const bugService = {
 
 async function query(filterBy = {}) {
     try {
-        console.log("filterBy", filterBy);
-
         const criteria = _buildCriteria(filterBy)
         const sort = _buildSort(filterBy)
-
         const collection = await dbService.getCollection('Bugs')
 
-        var bugCursor = collection.find(criteria, { sort })
+        let cursor = collection.find(criteria, { sort })
 
+        if (filterBy.pageIdx !== undefined)
+            cursor = cursor.skip(filterBy.pageIdx * PAGE_SIZE).limit(PAGE_SIZE)
 
-        if (filterBy.pageIdx !== undefined) {
-            bugCursor = bugCursor.skip(filterBy.pageIdx * PAGE_SIZE).limit(PAGE_SIZE)
-        }
-
-        const bugs = await bugCursor.toArray()
-        console.log("bugs", bugs);
-        return bugs
+        return await cursor.toArray()
     } catch (err) {
         loggerService.error('cannot find bugs', err)
         throw err
@@ -41,13 +33,13 @@ async function query(filterBy = {}) {
 
 async function getById(bugId) {
     try {
-        const criteria = { _id: ObjectId.createFromHexString(bugId) }
         const collection = await dbService.getCollection('Bugs')
+        const criteria = ObjectId.isValid(bugId)
+            ? { _id: new ObjectId(bugId) }
+            : { _id: bugId }
+
         const bug = await collection.findOne(criteria)
-
         if (!bug) throw `Couldn't find bug with _id ${bugId}`
-
-        bug.createdAt = bug._id.getTimestamp()
         return bug
     } catch (err) {
         loggerService.error(`while finding bug ${bugId}`, err)
@@ -60,13 +52,15 @@ async function remove(bugId) {
     const { _id: userId, isAdmin } = loggedinUser
 
     try {
-        const criteria = { _id: ObjectId.createFromHexString(bugId) }
+        const collection = await dbService.getCollection('Bugs')
+        const criteria = ObjectId.isValid(bugId)
+            ? { _id: new ObjectId(bugId) }
+            : { _id: bugId }
+
         if (!isAdmin) criteria['creator._id'] = userId
 
-        const collection = await dbService.getCollection('Bugs')
         const res = await collection.deleteOne(criteria)
-
-        if (res.deletedCount === 0) throw new Error('Not authorized to remove this bug')
+        if (res.deletedCount === 0) throw new Error('Not authorized or bug not found')
         return bugId
     } catch (err) {
         loggerService.error(`cannot remove bug ${bugId}`, err)
@@ -76,28 +70,30 @@ async function remove(bugId) {
 
 async function add(bug) {
     try {
+        const collection = await dbService.getCollection('Bugs')
         const bugToAdd = {
             title: bug.title,
             severity: bug.severity,
             labels: bug.labels,
             description: bug.description,
             createdAt: Date.now(),
-            creator: bug.creator, // make sure frontend sends it
+            creator: bug.creator,
         }
-
-        const collection = await dbService.getCollection('Bugs')
-        const result = await collection.insertOne(bugToAdd)
-        return { ...bugToAdd, _id: result.insertedId }
+        const res = await collection.insertOne(bugToAdd)
+        return { ...bugToAdd, _id: res.insertedId }
     } catch (err) {
         loggerService.error('cannot insert bug', err)
         throw err
     }
 }
 
-
 async function update(bug) {
     try {
-        const criteria = { _id: ObjectId.createFromHexString(bug._id) }
+        const collection = await dbService.getCollection('Bugs')
+        const criteria = ObjectId.isValid(bug._id)
+            ? { _id: new ObjectId(bug._id) }
+            : { _id: bug._id }
+
         const bugToSave = {
             title: bug.title,
             severity: bug.severity,
@@ -105,7 +101,6 @@ async function update(bug) {
             description: bug.description,
         }
 
-        const collection = await dbService.getCollection('Bugs')
         await collection.updateOne(criteria, { $set: bugToSave })
         return bug
     } catch (err) {
@@ -116,18 +111,10 @@ async function update(bug) {
 
 function _buildCriteria(filterBy) {
     const criteria = {}
-    if (filterBy.title) {
-        criteria.title = { $regex: filterBy.title, $options: 'i' }
-    }
-    if (filterBy.minSeverity) {
-        criteria.severity = { $gte: +filterBy.minSeverity }
-    }
-    if (filterBy.creatorId) {
-        criteria['creator._id'] = filterBy.creatorId
-    }
-    if (filterBy.labels && filterBy.labels.length) {
-        criteria.labels = { $all: Array.isArray(filterBy.labels) ? filterBy.labels : [filterBy.labels] }
-    }
+    if (filterBy.title) criteria.title = { $regex: filterBy.title, $options: 'i' }
+    if (filterBy.minSeverity) criteria.severity = { $gte: +filterBy.minSeverity }
+    if (filterBy.creatorId) criteria['creator._id'] = filterBy.creatorId
+    if (filterBy.labels?.length) criteria.labels = { $all: filterBy.labels }
     return criteria
 }
 

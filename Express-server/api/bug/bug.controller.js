@@ -79,8 +79,8 @@ export async function addBug(req, res) {
             }
         }
 
-        const savedBug = await bugService.save(bugToSave, loggedinUser)
-        res.send({ savedBug })
+        const savedBug = await bugService.add(bugToSave, loggedinUser)
+        res.send( savedBug )
     } catch (err) {
         console.error('Error saving bug:', err)
         res.status(500).send({ err: 'Failed to save bug' })
@@ -104,8 +104,8 @@ export async function updateBug(req, res) {
             creator: existingBug.creator
         }
 
-        const savedBug = await bugService.save(bugToSave)
-        res.send({ savedBug })
+        const savedBug = await bugService.update(bugToSave)
+        res.send( savedBug )
     } catch (err) {
         console.error('Failed to update bug:', err)
         res.status(500).send({ err: 'Failed to update bug' })

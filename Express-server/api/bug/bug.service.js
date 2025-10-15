@@ -76,14 +76,24 @@ async function remove(bugId) {
 
 async function add(bug) {
     try {
+        const bugToAdd = {
+            title: bug.title,
+            severity: bug.severity,
+            labels: bug.labels,
+            description: bug.description,
+            createdAt: Date.now(),
+            creator: bug.creator, // make sure frontend sends it
+        }
+
         const collection = await dbService.getCollection('Bugs')
-        await collection.insertOne(bug)
-        return bug
+        const result = await collection.insertOne(bugToAdd)
+        return { ...bugToAdd, _id: result.insertedId }
     } catch (err) {
         loggerService.error('cannot insert bug', err)
         throw err
     }
 }
+
 
 async function update(bug) {
     try {

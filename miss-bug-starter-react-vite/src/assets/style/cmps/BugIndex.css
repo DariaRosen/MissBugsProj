@@ -1,13 +1,196 @@
+/* PAGINATION */
+.bug-pagination {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  font-family: "Arial", sans-serif;
+}
+
+.bug-pagination label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.bug-pagination button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: rgb(241, 212, 241);
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.bug-pagination button:hover {
+  background-color: rgb(200, 180, 200);
+  transform: translateY(-1px);
+}
+
+/* ADD BUG BUTTON */
+button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: rgb(223, 219, 104); 
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background-color: rgb(143, 140, 37);;
+  transform: translateY(-1px);
+}
+
+/* MODAL BACKDROP */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
+/* MODAL STYLING */
 .modal {
-  background: white;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 12px;
   max-width: 400px;
-  margin: 10% auto;
+  width: 90%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* MODAL HEADINGS */
+.modal h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  text-align: center;
+  font-family: "Arial", sans-serif;
+}
+
+/* FORM INPUTS */
+.modal input,
+.modal textarea,
+.modal select {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: 0.2s;
+}
+
+.modal input:focus,
+.modal textarea:focus,
+.modal select:focus {
+  border-color: rgb(241, 212, 241);
+  box-shadow: 0 0 5px rgba(241, 212, 241, 0.5);
+}
+
+/* TEXTAREA */
+.modal textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* MODAL ACTIONS */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.modal-actions button {
+  flex: unset;
+}
+
+/* BUG FILTER AND SORTING */
+.BugFilter,
+.BugSorting {
+  margin-bottom: 15px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* BUG LIST */
+.BugList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* INDIVIDUAL BUG ITEM */
+.BugList .bug-item {
+  padding: 10px 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(5px);
+  transition: 0.2s;
+}
+
+.BugList .bug-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* BUG LABELS */
+.bug-item .labels {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.bug-item .labels span {
+  background-color: rgb(241, 212, 241);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* RESPONSIVE */
+@media (max-width: 720px) {
+  .modal {
+    padding: 1rem;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
+}
+
+.bug-index {
+  padding: 30px;
 }

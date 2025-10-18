@@ -128,7 +128,7 @@ export function BugIndex() {
   }
 
   return (
-    <section>
+    <section className="bug-index">
       {/* PAGINATION */}
       <div className="bug-pagination">
         <label> Use paging

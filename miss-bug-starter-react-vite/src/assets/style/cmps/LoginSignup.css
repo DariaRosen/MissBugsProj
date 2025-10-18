@@ -51,7 +51,8 @@
 }
 
 .login-signup-inline button:hover {
-  background-color: rgb(200, 180, 200);
+  background-color: rgb(143, 140, 37);
+  color: white;
   transform: translateY(-1px);
 }
 

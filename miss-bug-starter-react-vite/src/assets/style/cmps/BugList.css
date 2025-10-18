@@ -12,4 +12,5 @@
     justify-content: space-around;
     align-items: center;
     background-color: var(--clr1bg);
+    border-radius: 12px;
 }

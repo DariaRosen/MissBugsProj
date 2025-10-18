@@ -1,0 +1,85 @@
+/* Container for login/signup section */
+.login-page {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Arial", sans-serif;
+}
+
+/* Inline container for login + signup */
+.login-signup-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 8px;
+  backdrop-filter: blur(5px);
+}
+
+/* Shared style for all inputs, selects, and buttons */
+.login-signup-inline input,
+.login-signup-inline select,
+.login-signup-inline button {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+/* Focus effect */
+.login-signup-inline input:focus,
+.login-signup-inline select:focus {
+  border-color: rgb(241, 212, 241);
+  box-shadow: 0 0 5px rgba(241, 212, 241, 0.5);
+}
+
+/* Buttons style */
+.login-signup-inline button {
+  border: none;
+  background-color: rgb(223, 219, 104);
+  font-weight: 600;
+  color: black;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  height: 31px;
+  width: 80px;
+  margin: 0;
+  text-decoration: none;
+}
+
+.login-signup-inline button:hover {
+  background-color: rgb(200, 180, 200);
+  transform: translateY(-1px);
+}
+
+/* Link-style toggle buttons */
+.btn-link {
+  background: none;
+  border: none;
+  color: #f1d4f1;
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.btn-link:hover {
+  color: #d18cd1;
+}
+
+/* Responsive: stack elements vertically on small screens */
+@media (max-width: 720px) {
+  .login-signup-inline {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .login-signup-inline input,
+  .login-signup-inline select,
+  .login-signup-inline button {
+    width: 100%;
+  }
+}

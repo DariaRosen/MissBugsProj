@@ -11,6 +11,13 @@
   justify-content: space-between; /* left, center, right */
 }
 
+.header-container > * {
+  flex: 1; /* each item takes same width */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .header-title {
   font-size: 1.5rem;
   font-weight: bold;
@@ -18,7 +25,7 @@
 
 .app-nav {
   display: flex;
-  gap: 20px;
+  gap: 50px;
   justify-content: center;
   flex: 1; /* takes remaining space for centering */
 }
@@ -28,11 +35,12 @@
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s;
+  font-size: 1.2rem;
 }
 
 .app-nav a:hover,
 a.active {
-  color: rgb(241, 212, 241);
+  color: rgb(223, 219, 104);
   font-weight: 600;
   text-decoration: underline;
 }

@@ -21,7 +21,7 @@ export function BugSorting({ onSetSortBy, currentSort }) {
     return (
         <div className="bug-sorting">
             <label>
-                Sort by:
+                <h2>Sort by:</h2>
                 <select value={sortBy} onChange={handleSortByChange}>
                     <option value="title">Title</option>
                     <option value="severity">Severity</option>

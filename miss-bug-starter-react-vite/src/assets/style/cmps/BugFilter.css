@@ -1,0 +1,14 @@
+.bug-filter h2{
+    color : var(--clr1);
+}
+
+.bug-sorting h2{
+    color : var(--clr1);
+}
+
+.bug-pagination label{
+    color : var(--clr1);
+    font-weight: 600;
+    font-size: 17px;
+    margin-top: 2rem;
+}

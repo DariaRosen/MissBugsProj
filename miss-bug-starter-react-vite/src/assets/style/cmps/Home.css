@@ -5,3 +5,9 @@
     align-items: center;
     justify-content: center;
 }
+
+.home img {
+    width: 700px;
+    height: auto;
+    object-fit: cover;
+}

@@ -48,27 +48,29 @@ export function AppHeader() {
   }
 
   return (
-    <header className='app-header '>
+    <header className='app-header'>
       <div className='header-container'>
-        <UserMsg />
-        <section className="login-signup-container">
-          {!loggedinUser && <LoginSignup onLogin={onLogin} onSignup={onSignup} />}
-
-          {loggedinUser && <div className="user-preview">
-            <h3>Hello {loggedinUser.fullname}</h3>
-            <button onClick={onLogout}>Logout</button>
-          </div>}
-        </section>
+        <h1 className="header-title">Bugs are Forever</h1>
 
         <nav className='app-nav'>
-          <NavLink to="/">Home</NavLink> |<NavLink to="/bug">Bugs</NavLink> |
-          <NavLink to="/about">About</NavLink> |
-          <NavLink to="/user">Users</NavLink> |
+          <NavLink to="/">Home</NavLink>
+          <NavLink to="/bug">Bugs</NavLink>
+          <NavLink to="/about">About</NavLink>
+          <NavLink to="/user">Users</NavLink>
           {loggedinUser && <NavLink to={`/user/${loggedinUser._id}`}>Details</NavLink>}
         </nav>
 
-        <h1>Bugs are Forever</h1>
+        <section className="login-signup-container">
+          {!loggedinUser && <LoginSignup onLogin={onLogin} onSignup={onSignup} />}
+          {loggedinUser && (
+            <div className="user-preview">
+              <h3>Hello {loggedinUser.fullname}</h3>
+              <button onClick={onLogout}>Logout</button>
+            </div>
+          )}
+        </section>
       </div>
     </header>
+
   )
 }

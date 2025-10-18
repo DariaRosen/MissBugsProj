@@ -15,13 +15,12 @@ export function LoginSignup({ onSignup, onLogin }) {
             const users = await userService.getUsers()
             setUsers(users)
         } catch (err) {
-            console.log('Had issues loading users', err);
+            console.log('Had issues loading users', err)
         }
     }
 
     function clearState() {
         setCredentials(userService.getEmptyUser())
-        setIsSignup(false)
     }
 
     function handleChange(ev) {
@@ -40,7 +39,6 @@ export function LoginSignup({ onSignup, onLogin }) {
             await onLogin(credentials)
         }
         clearState()
-
     }
 
     function toggleSignup() {
@@ -48,50 +46,59 @@ export function LoginSignup({ onSignup, onLogin }) {
     }
 
     if (!users.length) return <div>Loading...</div>
+
     return (
         <div className="login-page">
-            <p>
-                <button className="btn-link" onClick={toggleSignup}>{!isSignup ? 'Signup' : 'Login'}</button>
-            </p>
-            {!isSignup && <form className="login-form" onSubmit={onSubmitForm}>
-                <select
-                    name="username"
-                    value={credentials.username}
-                    onChange={handleChange}
-                >
-                    <option value="">Select User</option>
-                    {users.map(user => <option key={user._id} value={user.username}>{user.fullname}</option>)}
-                </select>
-                <button>Login!</button>
-            </form>}
-            <div className="signup-section">
-                {isSignup && <form className="signup-form" onSubmit={onSubmitForm}>
-                    <input
-                        type="text"
-                        name="fullname"
-                        value={credentials.fullname}
-                        placeholder="Fullname"
-                        onChange={handleChange}
-                        required
-                    />
-                    <input
-                        type="text"
-                        name="username"
-                        value={credentials.username}
-                        placeholder="Username"
-                        onChange={handleChange}
-                        required
-                    />
-                    <input
-                        type="password"
-                        name="password"
-                        value={credentials.password}
-                        placeholder="Password"
-                        onChange={handleChange}
-                        required
-                    />
-                    <button >Signup!</button>
-                </form>}
+            <div className="login-signup-inline">
+                {!isSignup && (
+                    <>
+                        <select
+                            name="username"
+                            value={credentials.username}
+                            onChange={handleChange}
+                        >
+                            <option value="">Select User</option>
+                            {users.map(user => (
+                                <option key={user._id} value={user.username}>
+                                    {user.fullname}
+                                </option>
+                            ))}
+                        </select>
+                        <button onClick={onSubmitForm}>Login</button>
+                        <button className="btn-link" onClick={toggleSignup}>Signup</button>
+                    </>
+                )}
+
+                {isSignup && (
+                    <>
+                        <input
+                            type="text"
+                            name="fullname"
+                            value={credentials.fullname}
+                            placeholder="Fullname"
+                            onChange={handleChange}
+                            required
+                        />
+                        <input
+                            type="text"
+                            name="username"
+                            value={credentials.username}
+                            placeholder="Username"
+                            onChange={handleChange}
+                            required
+                        />
+                        <input
+                            type="password"
+                            name="password"
+                            value={credentials.password}
+                            placeholder="Password"
+                            onChange={handleChange}
+                            required
+                        />
+                        <button onClick={onSubmitForm}>Signup</button>
+                        <button className="btn-link" onClick={toggleSignup}>Login</button>
+                    </>
+                )}
             </div>
         </div>
     )
